@@ -1,22 +1,5 @@
 #include "engine.hpp"
 
-std::string sha1(const std::string& password)
-{
-    //TODO
-    return password;
-}
-
-std::string get_cookie_value(const std::string& cookie)
-{
-    return cookie.substr(0, cookie.find(' ') + 1);
-}
-
-std::string get_pid_value(const std::string& body)
-{
-    size_t size = body.find("value") + 7;
-    return body.substr(size, body.find('"', size) - size);
-}
-
 Engine::Engine()
 {
     http.setHost("http://game.oldmargonem.pl/");
@@ -28,6 +11,21 @@ sf::Time Engine::clock_restart()
     sf::Time diff = now - last_clock;
     last_clock = now;
     return diff;
+}
+
+std::string sha1(const std::string& password)
+{
+    //TODO
+    return password;
+}
+std::string get_cookie_value(const std::string& field)
+{
+    return field.substr(0, field.find(' ') + 1);
+}
+std::string get_pid_value(const std::string& body)
+{
+    size_t size = body.find("value") + 7;
+    return body.substr(size, body.find('"', size) - size);
 }
 
 void Engine::login(const std::string& login, const std::string& password)
@@ -62,6 +60,18 @@ void Engine::logout()
     pdir.clear();
 }
 
+void Engine::load_game()
+{
+    send_command("initlvl=1&build=1007&task=init");
+    process_response(response.getBody());
+    send_command("initlvl=2&task=init");
+    process_response(response.getBody());
+    send_command("initlvl=3&task=init");
+    process_response(response.getBody());
+    send_command("initlvl=4&task=init");
+    process_response(response.getBody());
+}
+
 void Engine::send_command(const std::string& command)
 {
     request.setUri("/db.php?"+
@@ -76,7 +86,20 @@ void Engine::send_command(const std::string& command)
     response = http.sendRequest(request);
 }
 
-void Engine::process_response()
+void Engine::process_response(const std::string& body)
 {
+    size_t old_pos = 0;
 
+    for(;;)
+    {
+        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
+        std::string line = body.substr(old_pos, new_pos - old_pos);
+
+
+
+        if(new_pos == std::string::npos)
+            break;
+        else
+            old_pos = new_pos + 11;
+    }
 }

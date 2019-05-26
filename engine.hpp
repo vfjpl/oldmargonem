@@ -20,12 +20,16 @@ class Engine
     sf::Uint16 ev;
 
     void send_command(const std::string& command);
-    void process_response();
+    void process_response(const std::string& body);
+
 public:
     Engine();
     sf::Time clock_restart();
+
     void login(const std::string& login, const std::string& password);
     void logout();
+
+    void load_game();
 };
 
 #endif // ENGINE_HPP_INCLUDED
