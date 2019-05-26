@@ -26,7 +26,6 @@ public:
     sf::Time clock_restart();
     void login(const std::string& login, const std::string& password);
     void logout();
-    void load_game();
 };
 
 #endif // ENGINE_HPP_INCLUDED
