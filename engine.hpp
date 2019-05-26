@@ -11,13 +11,13 @@ class Engine
     sf::Http::Response response;
     std::string cookie;
     std::string pid;
+    std::string ev;
     std::string lastch;
     std::string lastcch;
     std::string bseq;
     std::string pdir;
     sf::Clock clock;
     sf::Time last_clock;
-    sf::Uint16 ev;
 
     void send_command(const std::string& command);
     void process_response(const std::string& body);
