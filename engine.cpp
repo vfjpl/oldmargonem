@@ -1,5 +1,7 @@
 #include "engine.hpp"
+#include <SFML/System/Sleep.hpp>
 #include <iostream>
+#include <cstring>
 
 Engine::Engine()
 {
@@ -89,6 +91,20 @@ void Engine::send_command(const std::string& command)
     response = http.sendRequest(request);
 }
 
+void Engine::process_response(const std::string& body)
+{
+    size_t old_pos = 0;
+    for(;;)
+    {
+        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
+        process_line(body.substr(old_pos, new_pos - old_pos));
+        if(new_pos == std::string::npos)
+            break;
+        else
+            old_pos = new_pos + 11;
+    }
+}
+
 int str2int(const std::string& str)
 {
     int res = 0;
@@ -99,37 +115,46 @@ int str2int(const std::string& str)
 constexpr int char2int(const char* str)
 {
     int res = 0;
-    for(sf::Uint8 i = 0; i < sizeof(str); ++i)
+    for(sf::Uint8 i = 0; i < strlen(str); ++i)
         res += str[i];
     return res;
 }
 
-void Engine::process_response(const std::string& body)
+void Engine::process_line(const std::string& line)
 {
-    size_t old_pos = 0;
+    size_t pos = line.find(':');
+    std::string cmd = line.substr(0, pos++);
 
-    for(;;)
+    switch(str2int(cmd))
     {
-        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
-        std::string line = body.substr(old_pos, new_pos - old_pos);
-        std::string cmd = line.substr(0, line.find(':'));
-
-        switch(str2int(cmd))
-        {
-        case char2int("sqltime"):
-        {
-            break;
-        }
-        default:
-        {
-            std::cout << cmd << " NOT IMPLEMENTED\n";
-            break;
-        }
-        }// end switch
-
-        if(new_pos == std::string::npos)
-            break;
-        else
-            old_pos = new_pos + 11;
+    case char2int("lastevent"):
+    {
+        ev = line.substr(pos);
+        break;
     }
+    case char2int("maxchat"):
+    {
+        lastch = line.substr(pos);
+        break;
+    }
+    case char2int("maxcchat"):
+    {
+        lastcch = line.substr(pos);
+        break;
+    }
+    case char2int("sqltime"):
+    {
+        sf::sleep(sf::microseconds(std::stof(line.substr(pos)) * 1000));
+        break;
+    }
+    case char2int("end"):
+    {
+        break;
+    }
+    default:
+    {
+        std::cout << cmd << " NOT IMPLEMENTED\n";
+        break;
+    }
+    }// end switch
 }

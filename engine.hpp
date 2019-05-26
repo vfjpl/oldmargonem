@@ -21,6 +21,7 @@ class Engine
 
     void send_command(const std::string& command);
     void process_response(const std::string& body);
+    void process_line(const std::string& line);
 
 public:
     Engine();
