@@ -27,23 +27,8 @@
 ////////////////////////////////////////////////////////////
 #include <SFML/Network/Http.hpp>
 #include <SFML/System/Err.hpp>
-#include <cctype>
-#include <algorithm>
-#include <iterator>
 #include <sstream>
 #include <limits>
-
-
-namespace
-{
-    // Convert a string to lower case
-    std::string toLower(std::string str)
-    {
-        for (std::string::iterator i = str.begin(); i != str.end(); ++i)
-            *i = static_cast<char>(std::tolower(*i));
-        return str;
-    }
-}
 
 
 namespace sf
@@ -61,7 +46,7 @@ Http::Request::Request(const std::string& uri, Method method, const std::string&
 ////////////////////////////////////////////////////////////
 void Http::Request::setField(const std::string& field, const std::string& value)
 {
-    m_fields[toLower(field)] = value;
+    m_fields[field] = value;
 }
 
 
@@ -75,11 +60,13 @@ void Http::Request::setMethod(Http::Request::Method method)
 ////////////////////////////////////////////////////////////
 void Http::Request::setUri(const std::string& uri)
 {
-    m_uri = uri;
-
     // Make sure it starts with a '/'
-    if (m_uri.empty() || (m_uri[0] != '/'))
-        m_uri.insert(0, "/");
+    if (uri.empty())
+	m_uri = '/';
+    else if (uri[0] != '/')
+        m_uri = '/' + uri;
+    else
+        m_uri = uri;
 }
 
 
@@ -115,8 +102,8 @@ std::string Http::Request::prepare() const
     }
 
     // Write the first line containing the request type
-    out << method << " " << m_uri << " ";
-    out << "HTTP/" << m_majorVersion << "." << m_minorVersion << "\r\n";
+    out << method << ' ' << m_uri << ' ';
+    out << "HTTP/" << m_majorVersion << '.' << m_minorVersion << "\r\n";
 
     // Write fields
     for (FieldTable::const_iterator i = m_fields.begin(); i != m_fields.end(); ++i)
@@ -137,7 +124,7 @@ std::string Http::Request::prepare() const
 ////////////////////////////////////////////////////////////
 bool Http::Request::hasField(const std::string& field) const
 {
-    return m_fields.find(toLower(field)) != m_fields.end();
+    return m_fields.find(field) != m_fields.end();
 }
 
 
@@ -161,7 +148,7 @@ const std::string& Http::Response::getField(const std::string& field) const
     }
     else
     {
-        static const std::string empty = "";
+        static const std::string empty;
         return empty;
     }
 }
@@ -205,7 +192,7 @@ void Http::Response::parse(const std::string& data)
     if (in >> version)
     {
         if ((version.size() >= 8) && (version[6] == '.') &&
-            (toLower(version.substr(0, 5)) == "http/")   &&
+            (version.substr(0, 5) == "HTTP/")   &&
              isdigit(version[5]) && isdigit(version[7]))
         {
             m_majorVersion = version[5] - '0';
@@ -241,7 +228,7 @@ void Http::Response::parse(const std::string& data)
     m_body.clear();
 
     // Determine whether the transfer is chunked
-    if (toLower(getField("transfer-encoding")) != "chunked")
+    if (getField("Transfer-Encoding") != "chunked")
     {
         // Not chunked - just read everything at once
         std::copy(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>(), std::back_inserter(m_body));
@@ -288,7 +275,7 @@ void Http::Response::parseFields(std::istream &in)
 
             // Remove any trailing \r
             if (!value.empty() && (*value.rbegin() == '\r'))
-                value.erase(value.size() - 1);
+                value.erase(--value.rbegin().base());
 
             // Add the field
             if (m_fields.find(field) == m_fields.end())
@@ -328,18 +315,18 @@ Http::Http(const std::string& host, unsigned short port)
 void Http::setHost(const std::string& host, unsigned short port)
 {
     // Check the protocol
-    if (toLower(host.substr(0, 7)) == "http://")
+    if (host.substr(0, 7) == "http://")
     {
         // HTTP protocol
         m_hostName = host.substr(7);
         m_port     = (port != 0 ? port : 80);
     }
-    else if (toLower(host.substr(0, 8)) == "https://")
+    else if (host.substr(0, 8) == "https://")
     {
         // HTTPS protocol -- unsupported (requires encryption and certificates and stuff...)
-        err() << "HTTPS protocol is not supported by sf::Http" << std::endl;
-        m_hostName = "";
-        m_port     = 0;
+        err() << "HTTPS protocol is not supported by sf::Http\n";
+        m_hostName.clear();
+        m_port = 0;
     }
     else
     {
@@ -350,7 +337,7 @@ void Http::setHost(const std::string& host, unsigned short port)
 
     // Remove any trailing '/' from the host name
     if (!m_hostName.empty() && (*m_hostName.rbegin() == '/'))
-        m_hostName.erase(m_hostName.size() - 1);
+        m_hostName.erase(--m_hostName.rbegin().base());
 
     m_host = IpAddress(m_hostName);
 }

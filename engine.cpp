@@ -34,7 +34,7 @@ std::string get_pid_value(const std::string& body)
 void Engine::login(const std::string& login, const std::string& password)
 {
     sf::Http http_login("http://www.oldmargonem.pl/");
-    sf::Http::Request request_login("/ajax/logon.php?t=login",
+    sf::Http::Request request_login("ajax/logon.php?t=login",
                                     sf::Http::Request::Post,
                                     "l=" + login + "&ph=" + sha1(password));
     sf::Http::Response response_login = http_login.sendRequest(request_login);
@@ -79,7 +79,7 @@ void Engine::load_game()
 
 void Engine::send_command(const std::string& command)
 {
-    request.setUri("/db.php?"+
+    request.setUri("db.php?"+
                    command+
                    "&pid="+pid+
                    "&ev="+ev+
