@@ -38,6 +38,8 @@
 		<Unit filename="Http.cpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />
+		<Unit filename="graphic_loader.cpp" />
+		<Unit filename="graphic_loader.hpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />

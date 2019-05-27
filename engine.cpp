@@ -91,20 +91,6 @@ void Engine::send_command(const std::string& command)
     response = http.sendRequest(request);
 }
 
-void Engine::process_response(const std::string& body)
-{
-    size_t old_pos = 0;
-    for(;;)
-    {
-        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
-        process_line(body.substr(old_pos, new_pos - old_pos));
-        if(new_pos == std::string::npos)
-            break;
-        else
-            old_pos = new_pos + 11;
-    }
-}
-
 int str2int(const std::string& str)
 {
     int res = 0;
@@ -119,42 +105,82 @@ constexpr int char2int(const char* str)
         res += str[i];
     return res;
 }
-
-void Engine::process_line(const std::string& line)
+std::vector<std::string> split(const std::string& parm)
 {
-    size_t pos = line.find(':');
-    std::string cmd = line.substr(0, pos++);
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = parm.find(';', old_pos);
+        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
 
-    switch(str2int(cmd))
+void Engine::process_response(const std::string& body)
+{
+    bool alldata = false;
+    for(size_t old_pos = 0;;)
     {
-    case char2int("lastevent"):
+        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
+        std::string line = body.substr(old_pos, new_pos - old_pos);
+        size_t colon = line.find(':');
+        std::string cmd = line.substr(0, colon);
+
+        switch(str2int(cmd))
+        {
+        case char2int("hero"):
+        {
+            std::vector<std::string> val = split(line.substr(colon+1));
+            break;
+        }
+        case char2int("town"):
+        {
+            std::vector<std::string> val = split(line.substr(colon+1));
+            break;
+        }
+        case char2int("lastevent"):
+        {
+            ev = line.substr(colon+1);
+            break;
+        }
+        case char2int("maxchat"):
+        {
+            lastch = line.substr(colon+1);
+            break;
+        }
+        case char2int("maxcchat"):
+        {
+            lastcch = line.substr(colon+1);
+            break;
+        }
+        case char2int("sqltime"):
+        {
+            sf::sleep(sf::microseconds(std::stof(line.substr(colon+1)) * 1000));
+            break;
+        }
+        case char2int("end"):
+        {
+            alldata = true;
+            break;
+        }
+        default:
+        {
+            std::cout << cmd << " NOT IMPLEMENTED\n";
+            break;
+        }
+        }// end switch
+
+        if(new_pos == std::string::npos)
+            break;
+
+        old_pos = new_pos + 11;
+    }// end for
+
+    if(!alldata)
     {
-        ev = line.substr(pos);
-        break;
+        std::cout << "INVALID PACKET\n";
     }
-    case char2int("maxchat"):
-    {
-        lastch = line.substr(pos);
-        break;
-    }
-    case char2int("maxcchat"):
-    {
-        lastcch = line.substr(pos);
-        break;
-    }
-    case char2int("sqltime"):
-    {
-        sf::sleep(sf::microseconds(std::stof(line.substr(pos)) * 1000));
-        break;
-    }
-    case char2int("end"):
-    {
-        break;
-    }
-    default:
-    {
-        std::cout << cmd << " NOT IMPLEMENTED\n";
-        break;
-    }
-    }// end switch
 }
