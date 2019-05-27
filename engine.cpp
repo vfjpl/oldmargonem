@@ -25,7 +25,7 @@ std::vector<std::string> split(const std::string& parm)
     for(size_t old_pos = 0;;)
     {
         size_t new_pos = parm.find(';', old_pos);
-        temp.emplace_back(parm.substr(old_pos, new_pos - old_pos));
+        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
         if(new_pos == std::string::npos)
             break;
         old_pos = new_pos + 1;
@@ -39,7 +39,7 @@ std::vector<std::string> splitv(const std::string& parm)
     {
         size_t new_pos = parm.find(';', old_pos);
         std::string key = parm.substr(old_pos, new_pos - old_pos);
-        temp.emplace_back(key.substr(key.find('=') + 1));
+        temp.push_back(key.substr(key.find('=') + 1));
         if(new_pos == std::string::npos)
             break;
         old_pos = new_pos + 1;

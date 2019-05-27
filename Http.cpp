@@ -62,7 +62,7 @@ void Http::Request::setUri(const std::string& uri)
 {
     // Make sure it starts with a '/'
     if (uri.empty())
-	m_uri = '/';
+        m_uri = '/';
     else if (uri[0] != '/')
         m_uri = '/' + uri;
     else
@@ -247,7 +247,7 @@ void Http::Response::parse(const std::string& data)
             // Copy the actual content data
             std::istreambuf_iterator<char> it(in);
             std::istreambuf_iterator<char> itEnd;
-            for (std::size_t i = 0; ((i < length) && (it != itEnd)); i++)
+            for (std::size_t i = 0; ((i < length) && (it != itEnd)); ++i)
                 m_body.push_back(*it++);
         }
 
@@ -275,7 +275,7 @@ void Http::Response::parseFields(std::istream &in)
 
             // Remove any trailing \r
             if (!value.empty() && (*value.rbegin() == '\r'))
-                value.erase(--value.rbegin().base());
+                value.pop_back();
 
             // Add the field
             if (m_fields.find(field) == m_fields.end())
@@ -337,7 +337,7 @@ void Http::setHost(const std::string& host, unsigned short port)
 
     // Remove any trailing '/' from the host name
     if (!m_hostName.empty() && (*m_hostName.rbegin() == '/'))
-        m_hostName.erase(--m_hostName.rbegin().base());
+        m_hostName.pop_back();
 
     m_host = IpAddress(m_hostName);
 }
