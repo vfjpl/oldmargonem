@@ -5,20 +5,6 @@
 
 namespace
 {
-std::string sha1(const std::string& password)
-{
-    //TODO
-    return password;
-}
-std::string get_cookie(const std::string& field)
-{
-    return field.substr(0, field.find(' ') + 1);
-}
-std::string get_pid_value(const std::string& body)
-{
-    size_t size = body.find("value") + 7;
-    return body.substr(size, body.find('"', size) - size);
-}
 int str2int(const std::string& str)
 {
     int res = 0;
@@ -39,7 +25,7 @@ std::vector<std::string> split(const std::string& parm)
     for(size_t old_pos = 0;;)
     {
         size_t new_pos = parm.find(';', old_pos);
-        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
+        temp.emplace_back(parm.substr(old_pos, new_pos - old_pos));
         if(new_pos == std::string::npos)
             break;
         old_pos = new_pos + 1;
@@ -53,7 +39,7 @@ std::vector<std::string> splitv(const std::string& parm)
     {
         size_t new_pos = parm.find(';', old_pos);
         std::string key = parm.substr(old_pos, new_pos - old_pos);
-        temp.push_back(key.substr(key.find('=') + 1));
+        temp.emplace_back(key.substr(key.find('=') + 1));
         if(new_pos == std::string::npos)
             break;
         old_pos = new_pos + 1;
@@ -62,77 +48,23 @@ std::vector<std::string> splitv(const std::string& parm)
 }
 }
 
-Engine::Engine()
+void Engine::main()
 {
-    http.setHost("http://game.oldmargonem.pl/");
-}
-
-sf::Time Engine::clock_restart()
-{
-    sf::Time now = clock.getElapsedTime();
-    sf::Time diff = now - last_clock;
-    last_clock = now;
-    return diff;
-}
-
-void Engine::login(const std::string& login, const std::string& password)
-{
-    sf::Http http_login("http://www.oldmargonem.pl/");
-    sf::Http::Request request_login("ajax/logon.php?t=login",
-                                    sf::Http::Request::Post,
-                                    "l=" + login + "&ph=" + sha1(password));
-    sf::Http::Response response_login = http_login.sendRequest(request_login);
-
-    //INIT
-    pdir = '0';
-    bseq = '0';
-    lastcch = '0';
-    lastch = '0';
-    ev = '0';
-    pid = get_pid_value(response_login.getBody());
-    cookie = get_cookie(response_login.getField("Set-Cookie"));
-    cookie += get_cookie(response_login.getField("Set-Cookie0"));
-    cookie += get_cookie(response_login.getField("Set-Cookie1"));
-    cookie += "mchar_id=" + pid;
-    request.setField("Cookie", cookie);
-}
-
-void Engine::logout()
-{
-    request = sf::Http::Request();
-    cookie.clear();
-    pid.clear();
-    ev.clear();
-    lastch.clear();
-    lastcch.clear();
-    bseq.clear();
-    pdir.clear();
+    network.login("login", "password");
+    load_game();
+    network.logout();
 }
 
 void Engine::load_game()
 {
-    send_command("initlvl=1&build=1007&task=init");
-    process_response(response.getBody());
-    send_command("initlvl=2&task=init");
-    process_response(response.getBody());
-    send_command("initlvl=3&task=init");
-    process_response(response.getBody());
-    send_command("initlvl=4&task=init");
-    process_response(response.getBody());
-}
-
-void Engine::send_command(const std::string& command)
-{
-    request.setUri("db.php?"+
-                   command+
-                   "&pid="+pid+
-                   "&ev="+ev+
-                   "&lastch="+lastch+
-                   "&lastcch="+lastcch+
-                   "&bseq="+bseq+
-                   "&pdir="+pdir+
-                   "&a="+std::to_string(clock.getElapsedTime().asMicroseconds()));
-    response = http.sendRequest(request);
+    network.send_command("initlvl=1&build=1007&task=init", clock.getElapsedTime());
+    process_response(network.get_response());
+    network.send_command("initlvl=2&task=init", clock.getElapsedTime());
+    process_response(network.get_response());
+    network.send_command("initlvl=3&task=init", clock.getElapsedTime());
+    process_response(network.get_response());
+    network.send_command("initlvl=4&task=init", clock.getElapsedTime());
+    process_response(network.get_response());
 }
 
 void Engine::process_response(const std::string& body)
@@ -150,28 +82,31 @@ void Engine::process_response(const std::string& body)
         case char2int("hero"):
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
-            graphic_loader.set_mpath(val[11]);
+            resource_manager.set_mpath(val[11]);
+            resource_manager.load_character(val[10]);
+            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
         case char2int("town"):
         {
             std::vector<std::string> val = split(line.substr(colon+1));
-            graphic_loader.load_image(val[2]);
+            resource_manager.load_map(val[2]);
+            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
         case char2int("lastevent"):
         {
-            ev = line.substr(colon+1);
+            network.set_ev(line.substr(colon+1));
             break;
         }
         case char2int("maxchat"):
         {
-            lastch = line.substr(colon+1);
+            network.set_lastch(line.substr(colon+1));
             break;
         }
         case char2int("maxcchat"):
         {
-            lastcch = line.substr(colon+1);
+            network.set_lastcch(line.substr(colon+1));
             break;
         }
         case char2int("sqltime"):

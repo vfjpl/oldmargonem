@@ -39,9 +39,13 @@
 		<Unit filename="Http.cpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />
-		<Unit filename="graphic_loader.cpp" />
-		<Unit filename="graphic_loader.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="myclock.cpp" />
+		<Unit filename="myclock.hpp" />
+		<Unit filename="network.cpp" />
+		<Unit filename="network.hpp" />
+		<Unit filename="resource_manager.cpp" />
+		<Unit filename="resource_manager.hpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />
