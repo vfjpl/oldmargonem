@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
+			<Add library="sfml-graphics" />
 			<Add library="sfml-network" />
 			<Add library="sfml-system" />
 		</Linker>

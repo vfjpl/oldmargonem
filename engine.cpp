@@ -3,6 +3,65 @@
 #include <iostream>
 #include <cstring>
 
+namespace
+{
+std::string sha1(const std::string& password)
+{
+    //TODO
+    return password;
+}
+std::string get_cookie(const std::string& field)
+{
+    return field.substr(0, field.find(' ') + 1);
+}
+std::string get_pid_value(const std::string& body)
+{
+    size_t size = body.find("value") + 7;
+    return body.substr(size, body.find('"', size) - size);
+}
+int str2int(const std::string& str)
+{
+    int res = 0;
+    for(sf::Uint8 i = 0; i < str.size(); ++i)
+        res += str[i];
+    return res;
+}
+constexpr int char2int(const char* str)
+{
+    int res = 0;
+    for(sf::Uint8 i = 0; i < strlen(str); ++i)
+        res += str[i];
+    return res;
+}
+std::vector<std::string> split(const std::string& parm)
+{
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = parm.find(';', old_pos);
+        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
+std::vector<std::string> splitv(const std::string& parm)
+{
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = parm.find(';', old_pos);
+        std::string key = parm.substr(old_pos, new_pos - old_pos);
+        temp.push_back(key.substr(key.find('=') + 1));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
+}
+
 Engine::Engine()
 {
     http.setHost("http://game.oldmargonem.pl/");
@@ -14,21 +73,6 @@ sf::Time Engine::clock_restart()
     sf::Time diff = now - last_clock;
     last_clock = now;
     return diff;
-}
-
-std::string sha1(const std::string& password)
-{
-    //TODO
-    return password;
-}
-std::string get_cookie_value(const std::string& field)
-{
-    return field.substr(0, field.find(' ') + 1);
-}
-std::string get_pid_value(const std::string& body)
-{
-    size_t size = body.find("value") + 7;
-    return body.substr(size, body.find('"', size) - size);
 }
 
 void Engine::login(const std::string& login, const std::string& password)
@@ -46,10 +90,10 @@ void Engine::login(const std::string& login, const std::string& password)
     lastch = '0';
     ev = '0';
     pid = get_pid_value(response_login.getBody());
-    cookie = get_cookie_value(response_login.getField("Set-Cookie"));
-    cookie += get_cookie_value(response_login.getField("Set-Cookie0"));
-    cookie += get_cookie_value(response_login.getField("Set-Cookie1"));
-    cookie += "mchar_id" + pid;
+    cookie = get_cookie(response_login.getField("Set-Cookie"));
+    cookie += get_cookie(response_login.getField("Set-Cookie0"));
+    cookie += get_cookie(response_login.getField("Set-Cookie1"));
+    cookie += "mchar_id=" + pid;
     request.setField("Cookie", cookie);
 }
 
@@ -91,34 +135,6 @@ void Engine::send_command(const std::string& command)
     response = http.sendRequest(request);
 }
 
-int str2int(const std::string& str)
-{
-    int res = 0;
-    for(sf::Uint8 i = 0; i < str.size(); ++i)
-        res += str[i];
-    return res;
-}
-constexpr int char2int(const char* str)
-{
-    int res = 0;
-    for(sf::Uint8 i = 0; i < strlen(str); ++i)
-        res += str[i];
-    return res;
-}
-std::vector<std::string> split(const std::string& parm)
-{
-    std::vector<std::string> temp;
-    for(size_t old_pos = 0;;)
-    {
-        size_t new_pos = parm.find(';', old_pos);
-        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
-        if(new_pos == std::string::npos)
-            break;
-        old_pos = new_pos + 1;
-    }
-    return temp;
-}
-
 void Engine::process_response(const std::string& body)
 {
     bool alldata = false;
@@ -133,12 +149,14 @@ void Engine::process_response(const std::string& body)
         {
         case char2int("hero"):
         {
-            std::vector<std::string> val = split(line.substr(colon+1));
+            std::vector<std::string> val = splitv(line.substr(colon+1));
+            graphic_loader.set_mpath(val[11]);
             break;
         }
         case char2int("town"):
         {
             std::vector<std::string> val = split(line.substr(colon+1));
+            graphic_loader.load_image(val[2]);
             break;
         }
         case char2int("lastevent"):

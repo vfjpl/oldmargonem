@@ -3,12 +3,14 @@
 
 #include <SFML/Network/Http.hpp>
 #include <SFML/System/Clock.hpp>
+#include "graphic_loader.hpp"
 
 class Engine
 {
     sf::Http http;
     sf::Http::Request request;
     sf::Http::Response response;
+    Graphic_Loader graphic_loader;
     std::string cookie;
     std::string pid;
     std::string ev;
