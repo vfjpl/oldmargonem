@@ -54,7 +54,7 @@ void Engine::main()
     setup_window(true);
     map.set_screen_size(window.getSize());
 
-    network.login();
+    network.login("","");
     load_game();
 
     while(loop)
@@ -88,13 +88,18 @@ void Engine::setup_window(bool fullscreen)
 
 void Engine::load_game()
 {
-    network.send_command("initlvl=1&build=1007&task=init", clock.getElapsedTime());
+    network.queue_command("initlvl=1&build=1007&task=init");
+    network.queue_command("initlvl=2&task=init");
+    network.queue_command("initlvl=3&task=init");
+    network.queue_command("initlvl=4&task=init");
+
+    network.send_command(clock.getElapsedTime());
     process_response(network.get_response());
-    network.send_command("initlvl=2&task=init", clock.getElapsedTime());
+    network.send_command(clock.getElapsedTime());
     process_response(network.get_response());
-    network.send_command("initlvl=3&task=init", clock.getElapsedTime());
+    network.send_command(clock.getElapsedTime());
     process_response(network.get_response());
-    network.send_command("initlvl=4&task=init", clock.getElapsedTime());
+    network.send_command(clock.getElapsedTime());
     process_response(network.get_response());
 }
 

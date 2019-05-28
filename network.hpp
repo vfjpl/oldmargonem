@@ -2,12 +2,14 @@
 #define NETWORK_HPP_INCLUDED
 
 #include <SFML/Network/Http.hpp>
+#include <queue>
 
 class Network
 {
     sf::Http http;
     sf::Http::Request request;
     sf::Http::Response response;
+    std::queue<std::string> fifo;
     std::string cookie;
     std::string pid;
     std::string ev;
@@ -28,7 +30,8 @@ public:
     void login(const std::string& login, const std::string& password);
     void logout();
 
-    void send_command(const std::string& command, sf::Time a);
+    void queue_command(const std::string& command);
+    void send_command(sf::Time a);
 };
 
 #endif // NETWORK_HPP_INCLUDED

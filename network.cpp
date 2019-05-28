@@ -78,6 +78,7 @@ void Network::login(const std::string& login, const std::string& password)
 void Network::logout()
 {
     request = sf::Http::Request();
+    fifo = std::queue<std::string>();
     cookie.clear();
     pid.clear();
     ev.clear();
@@ -87,10 +88,21 @@ void Network::logout()
     pdir.clear();
 }
 
-void Network::send_command(const std::string& command, sf::Time a)
+void Network::queue_command(const std::string& command)
 {
+    fifo.push(command);
+}
+
+void Network::send_command(sf::Time a)
+{
+    std::string cmd;
+    if(!fifo.empty())
+        cmd = fifo.front();
+    else
+        cmd = "task=_";
+
     request.setUri("db.php?"+
-                   command+
+                   cmd+
                    "&pid="+pid+
                    "&ev="+ev+
                    "&lastch="+lastch+
@@ -98,5 +110,6 @@ void Network::send_command(const std::string& command, sf::Time a)
                    "&bseq="+bseq+
                    "&pdir="+pdir+
                    "&a="+std::to_string(a.asMicroseconds()));
+    fifo.pop();
     response = http.sendRequest(request);
 }
