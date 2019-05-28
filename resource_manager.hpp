@@ -19,6 +19,7 @@ class Resource_Manager
 public:
     Resource_Manager();
     void set_mpath(const std::string& value);
+    const sf::Texture& get_texture(const std::string& name) const;
     void load_graphic(const std::string& name, const Graphic what);
 };
 

@@ -50,9 +50,29 @@ std::vector<std::string> splitv(const std::string& parm)
 
 void Engine::main()
 {
-    network.login("","");
+    setup_window(false);
+    network.login();
     load_game();
+
     network.logout();
+}
+
+void Engine::setup_window(const bool fullscreen)
+{
+    sf::VideoMode mode = sf::VideoMode::getDesktopMode();
+    if(fullscreen)
+    {
+        window.create(mode, "oldmargonem", sf::Style::Fullscreen);
+    }
+    else
+    {
+        mode.width = (mode.width*2)/3;
+        mode.height = (mode.height*2)/3;
+        window.create(mode, "oldmargonem", sf::Style::Close);
+    }
+    window.setFramerateLimit(30);
+    window.clear();
+    window.display();
 }
 
 void Engine::load_game()
@@ -91,6 +111,7 @@ void Engine::process_response(const std::string& body)
         {
             std::vector<std::string> val = split(line.substr(colon+1));
             resource_manager.load_graphic(val[2], Graphic::MAP);
+            map.set_texture(resource_manager.get_texture(val[2]));
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }

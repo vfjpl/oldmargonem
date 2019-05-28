@@ -12,6 +12,11 @@ void Resource_Manager::set_mpath(const std::string& value)
     mpath = value;
 }
 
+const sf::Texture& Resource_Manager::get_texture(const std::string& name) const
+{
+    return storage.at(name);
+}
+
 void Resource_Manager::load_graphic(const std::string& name, const Graphic what)
 {
     if(storage.count(name))
