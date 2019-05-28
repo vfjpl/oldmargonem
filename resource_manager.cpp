@@ -2,11 +2,6 @@
 #include <SFML/Network/Http.hpp>
 #include <iostream>
 
-Resource_Manager::Resource_Manager()
-{
-    size_in_bytes = 0;
-}
-
 void Resource_Manager::set_mpath(const std::string& value)
 {
     mpath = value;
@@ -51,17 +46,17 @@ void Resource_Manager::load_graphic(const std::string& name, const Graphic what)
 
         float scale = sf::Texture::getMaximumSize();
         sf::Vector2u orginal_size = orginal.getSize();
-        float scale_x = scale / orginal_size.x;
-        float scale_y = scale / orginal_size.y;
-        if(scale_x < scale_y)
+        float scale_x = orginal_size.x / scale;
+        float scale_y = orginal_size.y / scale;
+        if(scale_x > scale_y)
             scale = scale_x;
         else
             scale = scale_y;
 
-        resized.create(orginal_size.x * scale, orginal_size.y * scale);
+        resized.create(orginal_size.x * 1/scale, orginal_size.y * 1/scale);
         sf::Vector2u resized_size = resized.getSize();
 
-        std::cout << "Resizing by: " << scale << ", New Size: " << resized_size.x << 'x' << resized_size.y << '\n';
+        std::cout << "Resizing by: " << 1/scale << ", New Size: " << resized_size.x << 'x' << resized_size.y << '\n';
 
         for(unsigned int y = 0; y < resized_size.y; ++y)
         {

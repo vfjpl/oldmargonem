@@ -21,6 +21,8 @@ public:
     void set_ev(const std::string& value);
     void set_lastch(const std::string& value);
     void set_lastcch(const std::string& value);
+    void set_bseq(const std::string& value);
+    void set_pdir(const std::string& value);
     const std::string& get_response() const;
 
     void login(const std::string& login, const std::string& password);

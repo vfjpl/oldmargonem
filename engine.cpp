@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include <SFML/System/Sleep.hpp>
+#include <SFML/Window/Event.hpp>
 #include <iostream>
 #include <cstring>
 
@@ -50,9 +51,18 @@ std::vector<std::string> splitv(const std::string& parm)
 
 void Engine::main()
 {
-    setup_window(false);
+    setup_window(true);
+    map.set_screen_size(window.getSize());
     network.login();
     load_game();
+
+    while(loop)
+    {
+        window.clear();
+        map.draw(window);
+        window.display();
+        input_handle();
+    }
 
     network.logout();
 }
@@ -102,6 +112,8 @@ void Engine::process_response(const std::string& body)
         case char2int("hero"):
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
+            map.set_hero_xy(std::stol(val[0]), std::stol(val[1]));
+            network.set_pdir(val[2]);
             resource_manager.set_mpath(val[11]);
             resource_manager.load_graphic(val[10], Graphic::HERO);
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
@@ -110,8 +122,11 @@ void Engine::process_response(const std::string& body)
         case char2int("town"):
         {
             std::vector<std::string> val = split(line.substr(colon+1));
+            map.set_map_size(std::stol(val[0]), std::stol(val[1]));
             resource_manager.load_graphic(val[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(val[2]));
+            map.set_name(val[3]);
+            map.set_id(val[6]);
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
@@ -156,5 +171,35 @@ void Engine::process_response(const std::string& body)
     if(!alldata)
     {
         std::cout << "INVALID PACKET\n";
+    }
+}
+
+void Engine::input_handle()
+{
+    sf::Event event;
+    while(window.pollEvent(event))
+    {
+        switch(event.type)
+        {
+        case sf::Event::KeyPressed:
+        {
+            loop = false;
+            break;
+        }
+        case sf::Event::Closed:
+        {
+            loop = false;
+            break;
+        }
+        case sf::Event::Resized:
+        {
+            window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }//end switch
     }
 }

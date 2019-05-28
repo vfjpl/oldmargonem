@@ -38,6 +38,16 @@ void Network::set_lastcch(const std::string& value)
     lastcch = value;
 }
 
+void Network::set_bseq(const std::string& value)
+{
+    bseq = value;
+}
+
+void Network::set_pdir(const std::string& value)
+{
+    pdir = value;
+}
+
 const std::string& Network::get_response() const
 {
     return response.getBody();
