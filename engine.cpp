@@ -53,13 +53,14 @@ void Engine::main()
 {
     setup_window(true);
     map.set_screen_size(window.getSize());
+
     network.login();
     load_game();
 
     while(loop)
     {
-        window.clear();
-        map.draw(window);
+        time = clock.restart();
+        map.draw(window, time);
         window.display();
         input_handle();
     }
@@ -67,7 +68,7 @@ void Engine::main()
     network.logout();
 }
 
-void Engine::setup_window(const bool fullscreen)
+void Engine::setup_window(bool fullscreen)
 {
     sf::VideoMode mode = sf::VideoMode::getDesktopMode();
     if(fullscreen)
@@ -112,7 +113,7 @@ void Engine::process_response(const std::string& body)
         case char2int("hero"):
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
-            map.set_hero_xy(std::stol(val[0]), std::stol(val[1]));
+            map.set_hero_pos(sf::Vector2i(std::stol(val[0]), std::stol(val[1])));
             network.set_pdir(val[2]);
             resource_manager.set_mpath(val[11]);
             resource_manager.load_graphic(val[10], Graphic::HERO);
@@ -122,7 +123,7 @@ void Engine::process_response(const std::string& body)
         case char2int("town"):
         {
             std::vector<std::string> val = split(line.substr(colon+1));
-            map.set_map_size(std::stol(val[0]), std::stol(val[1]));
+            map.set_map_size(sf::Vector2i(std::stol(val[0]), std::stol(val[1])));
             resource_manager.load_graphic(val[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(val[2]));
             map.set_name(val[3]);
@@ -176,6 +177,8 @@ void Engine::process_response(const std::string& body)
 
 void Engine::input_handle()
 {
+    static int x = 1;
+    static int y = 1;
     sf::Event event;
     while(window.pollEvent(event))
     {
@@ -183,7 +186,34 @@ void Engine::input_handle()
         {
         case sf::Event::KeyPressed:
         {
-            loop = false;
+            switch(event.key.code)
+            {
+            case sf::Keyboard::Up:
+                {
+                    map.set_hero_pos(sf::Vector2i(x, --y));
+                    break;
+                }
+            case sf::Keyboard::Down:
+                {
+                    map.set_hero_pos(sf::Vector2i(x, ++y));
+                    break;
+                }
+            case sf::Keyboard::Left:
+                {
+                    map.set_hero_pos(sf::Vector2i(--x, y));
+                    break;
+                }
+            case sf::Keyboard::Right:
+                {
+                    map.set_hero_pos(sf::Vector2i(++x, y));
+                    break;
+                }
+            default:
+                {
+                    loop = false;
+                    break;
+                }
+            }
             break;
         }
         case sf::Event::Closed:

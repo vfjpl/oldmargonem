@@ -87,7 +87,7 @@ void Network::logout()
     pdir.clear();
 }
 
-void Network::send_command(const std::string& command, const sf::Time a)
+void Network::send_command(const std::string& command, sf::Time a)
 {
     request.setUri("db.php?"+
                    command+

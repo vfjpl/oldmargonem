@@ -12,7 +12,7 @@ const sf::Texture& Resource_Manager::get_texture(const std::string& name) const
     return storage.at(name);
 }
 
-void Resource_Manager::load_graphic(const std::string& name, const Graphic what)
+void Resource_Manager::load_graphic(const std::string& name, Graphic what)
 {
     if(storage.count(name))
         return;
@@ -53,7 +53,7 @@ void Resource_Manager::load_graphic(const std::string& name, const Graphic what)
         else
             scale = scale_y;
 
-        resized.create(orginal_size.x * 1/scale, orginal_size.y * 1/scale);
+        resized.create(orginal_size.x / scale, orginal_size.y / scale);
         sf::Vector2u resized_size = resized.getSize();
 
         std::cout << "Resizing by: " << 1/scale << ", New Size: " << resized_size.x << 'x' << resized_size.y << '\n';

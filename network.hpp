@@ -28,7 +28,7 @@ public:
     void login(const std::string& login, const std::string& password);
     void logout();
 
-    void send_command(const std::string& command, const sf::Time a);
+    void send_command(const std::string& command, sf::Time a);
 };
 
 #endif // NETWORK_HPP_INCLUDED
