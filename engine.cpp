@@ -50,7 +50,7 @@ std::vector<std::string> splitv(const std::string& parm)
 
 void Engine::main()
 {
-    network.login("login", "password");
+    network.login("","");
     load_game();
     network.logout();
 }
@@ -83,14 +83,14 @@ void Engine::process_response(const std::string& body)
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
             resource_manager.set_mpath(val[11]);
-            resource_manager.load_character(val[10]);
+            resource_manager.load_graphic(val[10], Graphic::HERO);
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
         case char2int("town"):
         {
             std::vector<std::string> val = split(line.substr(colon+1));
-            resource_manager.load_map(val[2]);
+            resource_manager.load_graphic(val[2], Graphic::MAP);
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
