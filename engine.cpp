@@ -60,6 +60,7 @@ void Engine::main()
     while(loop)
     {
         time = clock.restart();
+        window.clear();
         map.draw(window, time);
         window.display();
         input_handle();
@@ -89,11 +90,14 @@ void Engine::setup_window(bool fullscreen)
 void Engine::load_game()
 {
     network.queue_load_sequence();
-    for(sf::Uint8 i = 0; i < 4U; ++i)
-    {
-        network.send_command(clock.getElapsedTime());
-        process_response(network.get_response());
-    }
+    network.send_command(clock.getElapsedTime());
+    process_response(network.get_response());
+    network.send_command(clock.getElapsedTime());
+    process_response(network.get_response());
+    network.send_command(clock.getElapsedTime());
+    process_response(network.get_response());
+    network.send_command(clock.getElapsedTime());
+    process_response(network.get_response());
 }
 
 void Engine::process_response(const std::string& body)
@@ -125,8 +129,9 @@ void Engine::process_response(const std::string& body)
             resource_manager.load_graphic(val[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(val[2]));
             map.set_map_name(val[3]);
+            map.set_map_pvp(val[4]);
+            //val[5] battle background
             map.set_map_id(val[6]);
-            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
         case char2int("lastevent"):
@@ -142,6 +147,13 @@ void Engine::process_response(const std::string& body)
         case char2int("maxcchat"):
         {
             network.set_lastcch(line.substr(colon+1));
+            break;
+        }
+        case char2int("battlemsg"):
+        {
+            std::vector<std::string> val = split(line.substr(colon+1));
+            network.set_bseq(val[0]);
+            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
         case char2int("sqltime"):

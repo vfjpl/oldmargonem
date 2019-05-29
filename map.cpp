@@ -1,6 +1,8 @@
 #include "map.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
+#define TILES_PER_SECOND 4
+
 void Map::set_map_id(const std::string& value)
 {
     map_id = value;
@@ -9,6 +11,11 @@ void Map::set_map_id(const std::string& value)
 void Map::set_map_name(const std::string& value)
 {
     map_name = value;
+}
+
+void Map::set_map_pvp(const std::string& value)
+{
+    map_pvp = value;
 }
 
 void Map::set_map_size(sf::Vector2u value)
@@ -21,7 +28,7 @@ void Map::set_screen_size(sf::Vector2u value)
     map_rect.width = value.x;
     map_rect.height = value.y;
     screen_size = value;
-    screen_center = value/2U;
+    screen_center = value/2u;
 }
 
 void Map::set_center_pos(sf::Vector2i value)
@@ -55,5 +62,14 @@ void Map::center_view()
 {
     map_rect.left = (center_pos.x * p_per_tile) + (p_correction) - (screen_center.x);
     map_rect.top = (center_pos.y * p_per_tile) + (p_correction) - (screen_center.y);
+    map_sprite.setTextureRect(map_rect);
+}
+
+void Map::center_view_smooth()
+{
+    map_rect.left = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
+                    + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * TILES_PER_SECOND);
+    map_rect.top = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
+                   + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * TILES_PER_SECOND);
     map_sprite.setTextureRect(map_rect);
 }

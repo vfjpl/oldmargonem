@@ -9,7 +9,6 @@ void Resource_Manager::set_mpath(const std::string& value)
 
 const sf::Texture& Resource_Manager::get_texture(const std::string& name) const
 {
-    //CHECK
     return storage.at(name);
 }
 

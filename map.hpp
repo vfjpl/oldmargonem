@@ -8,6 +8,7 @@ class Map
 {
     std::string map_name;
     std::string map_id;
+    std::string map_pvp;
     sf::Sprite map_sprite;
     sf::IntRect map_rect;
     sf::Vector2u map_size;
@@ -26,6 +27,7 @@ class Map
 public:
     void set_map_id(const std::string& value);
     void set_map_name(const std::string& value);
+    void set_map_pvp(const std::string& value);
     void set_map_size(sf::Vector2u value);
 
     void set_screen_size(sf::Vector2u value);
@@ -36,6 +38,7 @@ public:
 
 private:
     void center_view();
+    void center_view_smooth();
 };
 
 #endif // MAP_HPP_INCLUDED
