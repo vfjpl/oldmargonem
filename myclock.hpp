@@ -9,7 +9,7 @@ class MyClock
     sf::Time last_clock;
 
 public:
-    sf::Time getElapsedTime();
+    sf::Time getElapsedTime() const;
     sf::Time restart();
 };
 

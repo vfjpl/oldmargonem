@@ -30,6 +30,7 @@ public:
     void login(const std::string& login, const std::string& password);
     void logout();
 
+    void queue_load_sequence();
     void queue_command(const std::string& command);
     void send_command(sf::Time a);
 };

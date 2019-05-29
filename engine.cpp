@@ -88,19 +88,12 @@ void Engine::setup_window(bool fullscreen)
 
 void Engine::load_game()
 {
-    network.queue_command("initlvl=1&build=1007&task=init");
-    network.queue_command("initlvl=2&task=init");
-    network.queue_command("initlvl=3&task=init");
-    network.queue_command("initlvl=4&task=init");
-
-    network.send_command(clock.getElapsedTime());
-    process_response(network.get_response());
-    network.send_command(clock.getElapsedTime());
-    process_response(network.get_response());
-    network.send_command(clock.getElapsedTime());
-    process_response(network.get_response());
-    network.send_command(clock.getElapsedTime());
-    process_response(network.get_response());
+    network.queue_load_sequence();
+    for(sf::Uint8 i = 0; i < 4U; ++i)
+    {
+        network.send_command(clock.getElapsedTime());
+        process_response(network.get_response());
+    }
 }
 
 void Engine::process_response(const std::string& body)
@@ -194,30 +187,30 @@ void Engine::input_handle()
             switch(event.key.code)
             {
             case sf::Keyboard::Up:
-                {
-                    map.set_hero_pos(sf::Vector2i(x, --y));
-                    break;
-                }
+            {
+                map.set_hero_pos(sf::Vector2i(x, --y));
+                break;
+            }
             case sf::Keyboard::Down:
-                {
-                    map.set_hero_pos(sf::Vector2i(x, ++y));
-                    break;
-                }
+            {
+                map.set_hero_pos(sf::Vector2i(x, ++y));
+                break;
+            }
             case sf::Keyboard::Left:
-                {
-                    map.set_hero_pos(sf::Vector2i(--x, y));
-                    break;
-                }
+            {
+                map.set_hero_pos(sf::Vector2i(--x, y));
+                break;
+            }
             case sf::Keyboard::Right:
-                {
-                    map.set_hero_pos(sf::Vector2i(++x, y));
-                    break;
-                }
+            {
+                map.set_hero_pos(sf::Vector2i(++x, y));
+                break;
+            }
             default:
-                {
-                    loop = false;
-                    break;
-                }
+            {
+                loop = false;
+                break;
+            }
             }
             break;
         }

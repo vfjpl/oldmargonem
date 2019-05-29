@@ -9,6 +9,7 @@ void Resource_Manager::set_mpath(const std::string& value)
 
 const sf::Texture& Resource_Manager::get_texture(const std::string& name) const
 {
+    //CHECK
     return storage.at(name);
 }
 
@@ -46,12 +47,12 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
 
         float scale = sf::Texture::getMaximumSize();
         sf::Vector2u orginal_size = orginal.getSize();
-        float scale_x = orginal_size.x / scale;
-        float scale_y = orginal_size.y / scale;
-        if(scale_x > scale_y)
-            scale = scale_x;
+        sf::Vector2f scale_xy(orginal_size);
+        scale_xy /= scale;
+        if(scale_xy.x > scale_xy.y)
+            scale = scale_xy.x;
         else
-            scale = scale_y;
+            scale = scale_xy.y;
 
         resized.create(orginal_size.x / scale, orginal_size.y / scale);
         sf::Vector2u resized_size = resized.getSize();

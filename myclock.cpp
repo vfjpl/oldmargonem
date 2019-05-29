@@ -1,6 +1,6 @@
 #include "myclock.hpp"
 
-sf::Time MyClock::getElapsedTime()
+sf::Time MyClock::getElapsedTime() const
 {
     return clock.getElapsedTime();
 }

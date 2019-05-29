@@ -4,7 +4,7 @@ namespace
 {
 std::string sha1(const std::string& password)
 {
-    //TODO
+    //TODO SHA1
     return password;
 }
 std::string get_cookie(const std::string& field)
@@ -88,6 +88,14 @@ void Network::logout()
     pdir.clear();
 }
 
+void Network::queue_load_sequence()
+{
+    fifo.emplace("initlvl=1&build=1007&task=init");
+    fifo.emplace("initlvl=2&task=init");
+    fifo.emplace("initlvl=3&task=init");
+    fifo.emplace("initlvl=4&task=init");
+}
+
 void Network::queue_command(const std::string& command)
 {
     fifo.push(command);
@@ -95,6 +103,7 @@ void Network::queue_command(const std::string& command)
 
 void Network::send_command(sf::Time a)
 {
+    //TODO BATTLE
     std::string cmd;
     if(!fifo.empty())
         cmd = fifo.front();
@@ -110,6 +119,6 @@ void Network::send_command(sf::Time a)
                    "&bseq="+bseq+
                    "&pdir="+pdir+
                    "&a="+std::to_string(a.asMicroseconds()));
-    fifo.pop();
     response = http.sendRequest(request);
+    fifo.pop();
 }
