@@ -111,7 +111,7 @@ void Engine::process_response(const std::string& body)
         case char2int("hero"):
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
-            map.set_hero_pos(sf::Vector2i(std::stol(val[0]), std::stol(val[1])));
+            map.set_center_pos(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
             network.set_pdir(val[2]);
             resource_manager.set_mpath(val[11]);
             resource_manager.load_graphic(val[10], Graphic::HERO);
@@ -121,11 +121,11 @@ void Engine::process_response(const std::string& body)
         case char2int("town"):
         {
             std::vector<std::string> val = split(line.substr(colon+1));
-            map.set_map_size(sf::Vector2i(std::stol(val[0]), std::stol(val[1])));
+            map.set_map_size(sf::Vector2u(std::stoul(val[0]), std::stoul(val[1])));
             resource_manager.load_graphic(val[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(val[2]));
-            map.set_name(val[3]);
-            map.set_id(val[6]);
+            map.set_map_name(val[3]);
+            map.set_map_id(val[6]);
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
@@ -175,8 +175,6 @@ void Engine::process_response(const std::string& body)
 
 void Engine::input_handle()
 {
-    static int x = 1;
-    static int y = 1;
     sf::Event event;
     while(window.pollEvent(event))
     {
@@ -184,34 +182,7 @@ void Engine::input_handle()
         {
         case sf::Event::KeyPressed:
         {
-            switch(event.key.code)
-            {
-            case sf::Keyboard::Up:
-            {
-                map.set_hero_pos(sf::Vector2i(x, --y));
-                break;
-            }
-            case sf::Keyboard::Down:
-            {
-                map.set_hero_pos(sf::Vector2i(x, ++y));
-                break;
-            }
-            case sf::Keyboard::Left:
-            {
-                map.set_hero_pos(sf::Vector2i(--x, y));
-                break;
-            }
-            case sf::Keyboard::Right:
-            {
-                map.set_hero_pos(sf::Vector2i(++x, y));
-                break;
-            }
-            default:
-            {
-                loop = false;
-                break;
-            }
-            }
+            loop = false;
             break;
         }
         case sf::Event::Closed:
