@@ -31,13 +31,14 @@ public:
 
     void set_screen_size(sf::Vector2u value);
     void set_center_pos(sf::Vector2i value);
+    void move_relative(sf::Vector2i value);
     void set_texture(const sf::Texture& texture);
 
-    void draw(sf::RenderWindow& window, sf::Time time);
+    void draw(sf::RenderWindow& window, sf::Time move_fraction);
 
 private:
     void center_view();
-    void center_view_smooth(sf::Time time);
+    void center_view_smooth(sf::Time move_fraction);
 };
 
 #endif // MAP_HPP_INCLUDED

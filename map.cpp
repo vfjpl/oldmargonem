@@ -37,6 +37,13 @@ void Map::set_center_pos(sf::Vector2i value)
     center_pos = value;
 }
 
+void Map::move_relative(sf::Vector2i value)
+{
+    center_old_pos = center_pos;
+    center_pos += value;
+    center_pos_diff = center_pos - center_old_pos;
+}
+
 void Map::set_texture(const sf::Texture& texture)
 {
     map_sprite.setTexture(texture);
@@ -48,10 +55,10 @@ void Map::set_texture(const sf::Texture& texture)
     center_view();
 }
 
-void Map::draw(sf::RenderWindow& window, sf::Time time)
+void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)
 {
-    if(time.asSeconds() < INTERRUPT_TIME)
-        center_view_smooth(time);
+    if(move_fraction.asSeconds() < INTERRUPT_TIME)
+        center_view_smooth(move_fraction);
     else
         center_view();
     window.draw(map_sprite);
@@ -64,11 +71,11 @@ void Map::center_view()
     map_sprite.setTextureRect(map_rect);
 }
 
-void Map::center_view_smooth(sf::Time time)
+void Map::center_view_smooth(sf::Time move_fraction)
 {
     map_rect.left = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
-                    + (center_pos_diff.x * p_per_tile * time.asSeconds() * MOVEMENT_SPEED);
+                    + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
     map_rect.top = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
-                   + (center_pos_diff.y * p_per_tile * time.asSeconds() * MOVEMENT_SPEED);
+                   + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
     map_sprite.setTextureRect(map_rect);
 }

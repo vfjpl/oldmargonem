@@ -198,16 +198,19 @@ void Engine::input_handle()
             switch(event.key.code)
             {
             case sf::Keyboard::W:
-                keyboard.up = true;
+                keyboard.set_up(true);
                 break;
             case sf::Keyboard::A:
-                keyboard.left = true;
+                keyboard.set_left(true);
                 break;
             case sf::Keyboard::S:
-                keyboard.down = true;
+                keyboard.set_down(true);
                 break;
             case sf::Keyboard::D:
-                keyboard.right = true;
+                keyboard.set_right(true);
+                break;
+            case sf::Keyboard::Escape:
+                loop = false;
                 break;
             default:
                 break;
@@ -219,16 +222,16 @@ void Engine::input_handle()
             switch(event.key.code)
             {
             case sf::Keyboard::W:
-                keyboard.up = false;
+                keyboard.set_up(false);
                 break;
             case sf::Keyboard::A:
-                keyboard.left = false;
+                keyboard.set_left(false);
                 break;
             case sf::Keyboard::S:
-                keyboard.down = false;
+                keyboard.set_down(false);
                 break;
             case sf::Keyboard::D:
-                keyboard.right = false;
+                keyboard.set_right(false);
                 break;
             default:
                 break;
@@ -255,5 +258,9 @@ void Engine::input_handle()
 
 void Engine::game_logic()
 {
-
+    if(keyboard.held_any_key())
+        if(clock.interrupt())
+            map.move_relative(sf::Vector2i(keyboard.held_right() - keyboard.held_left(),
+                                           keyboard.held_down() - keyboard.held_up()));
+    clock.update();
 }
