@@ -7,10 +7,14 @@ class MyClock
 {
     sf::Clock clock;
     sf::Time last_clock;
+    sf::Time interrupt_time;
 
 public:
     sf::Time getElapsedTime() const;
-    sf::Time restart();
+    sf::Time getInterruptTime() const;
+
+    void update();
+    bool interrupt();
 };
 
 #endif // MYCLOCK_HPP_INCLUDED

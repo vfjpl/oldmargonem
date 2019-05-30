@@ -20,7 +20,6 @@ class Map
     sf::Vector2i center_old_pos;
     sf::Vector2i center_pos_diff;
 
-    sf::Time move_fraction;
     float p_per_tile;
     float p_correction;
 
@@ -38,7 +37,7 @@ public:
 
 private:
     void center_view();
-    void center_view_smooth();
+    void center_view_smooth(sf::Time time);
 };
 
 #endif // MAP_HPP_INCLUDED

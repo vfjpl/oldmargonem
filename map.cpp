@@ -1,7 +1,6 @@
 #include "map.hpp"
 #include <SFML/Graphics/Texture.hpp>
-
-#define TILES_PER_SECOND 4
+#include "config.hpp"
 
 void Map::set_map_id(const std::string& value)
 {
@@ -36,7 +35,6 @@ void Map::set_center_pos(sf::Vector2i value)
     center_pos_diff = value - center_pos;
     center_old_pos = center_pos;
     center_pos = value;
-    move_fraction = sf::Time::Zero;
 }
 
 void Map::set_texture(const sf::Texture& texture)
@@ -52,9 +50,10 @@ void Map::set_texture(const sf::Texture& texture)
 
 void Map::draw(sf::RenderWindow& window, sf::Time time)
 {
-    move_fraction += time;
-
-    center_view();
+    if(time.asSeconds() < INTERRUPT_TIME)
+        center_view_smooth(time);
+    else
+        center_view();
     window.draw(map_sprite);
 }
 
@@ -65,11 +64,11 @@ void Map::center_view()
     map_sprite.setTextureRect(map_rect);
 }
 
-void Map::center_view_smooth()
+void Map::center_view_smooth(sf::Time time)
 {
     map_rect.left = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
-                    + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * TILES_PER_SECOND);
+                    + (center_pos_diff.x * p_per_tile * time.asSeconds() * MOVEMENT_SPEED);
     map_rect.top = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
-                   + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * TILES_PER_SECOND);
+                   + (center_pos_diff.y * p_per_tile * time.asSeconds() * MOVEMENT_SPEED);
     map_sprite.setTextureRect(map_rect);
 }

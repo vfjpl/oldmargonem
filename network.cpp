@@ -1,4 +1,5 @@
 #include "network.hpp"
+#include "config.hpp"
 
 namespace
 {
@@ -20,7 +21,7 @@ std::string get_pid_value(const std::string& body)
 
 Network::Network()
 {
-    http.setHost("http://game.oldmargonem.pl/");
+    http.setHost(GAME_ADDRES);
 }
 
 void Network::set_ev(const std::string& value)
@@ -55,7 +56,7 @@ const std::string& Network::get_response() const
 
 void Network::login(const std::string& login, const std::string& password)
 {
-    sf::Http http_login("http://www.oldmargonem.pl/");
+    sf::Http http_login(LOGIN_ADDRES);
     sf::Http::Request request_login("ajax/logon.php?t=login",
                                     sf::Http::Request::Post,
                                     "l=" + login + "&ph=" + sha1(password));

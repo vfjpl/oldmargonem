@@ -54,16 +54,15 @@ void Engine::main()
     setup_window(true);
     map.set_screen_size(window.getSize());
 
-    network.login("","");
+    network.login();
     load_game();
 
     while(loop)
     {
-        time = clock.restart();
-        window.clear();
-        map.draw(window, time);
-        window.display();
         input_handle();
+        game_logic();
+        map.draw(window, clock.getInterruptTime());
+        window.display();
     }
 
     network.logout();
@@ -83,6 +82,7 @@ void Engine::setup_window(bool fullscreen)
         window.create(mode, "oldmargonem", sf::Style::Close);
     }
     window.setFramerateLimit(30);
+    window.setKeyRepeatEnabled(false);
     window.clear();
     window.display();
 }
@@ -187,6 +187,7 @@ void Engine::process_response(const std::string& body)
 
 void Engine::input_handle()
 {
+    keyboard.update();
     sf::Event event;
     while(window.pollEvent(event))
     {
@@ -194,7 +195,44 @@ void Engine::input_handle()
         {
         case sf::Event::KeyPressed:
         {
-            loop = false;
+            switch(event.key.code)
+            {
+            case sf::Keyboard::W:
+                keyboard.up = true;
+                break;
+            case sf::Keyboard::A:
+                keyboard.left = true;
+                break;
+            case sf::Keyboard::S:
+                keyboard.down = true;
+                break;
+            case sf::Keyboard::D:
+                keyboard.right = true;
+                break;
+            default:
+                break;
+            }// end switch
+            break;
+        }
+        case sf::Event::KeyReleased:
+        {
+            switch(event.key.code)
+            {
+            case sf::Keyboard::W:
+                keyboard.up = false;
+                break;
+            case sf::Keyboard::A:
+                keyboard.left = false;
+                break;
+            case sf::Keyboard::S:
+                keyboard.down = false;
+                break;
+            case sf::Keyboard::D:
+                keyboard.right = false;
+                break;
+            default:
+                break;
+            }// end switch
             break;
         }
         case sf::Event::Closed:
@@ -213,4 +251,9 @@ void Engine::input_handle()
         }
         }//end switch
     }
+}
+
+void Engine::game_logic()
+{
+
 }

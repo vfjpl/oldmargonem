@@ -38,6 +38,7 @@
 			<Add library="sfml-system" />
 		</Linker>
 		<Unit filename="Http.cpp" />
+		<Unit filename="config.hpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />
 		<Unit filename="main.cpp" />
@@ -45,6 +46,8 @@
 		<Unit filename="map.hpp" />
 		<Unit filename="myclock.cpp" />
 		<Unit filename="myclock.hpp" />
+		<Unit filename="mykeyboard.cpp" />
+		<Unit filename="mykeyboard.hpp" />
 		<Unit filename="network.cpp" />
 		<Unit filename="network.hpp" />
 		<Unit filename="resource_manager.cpp" />
