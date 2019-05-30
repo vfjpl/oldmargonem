@@ -57,7 +57,7 @@ void Engine::main()
     network.login();
     load_game();
 
-    while(loop)
+    while(!quit)
     {
         input_handle();
         game_logic();
@@ -115,37 +115,41 @@ void Engine::process_response(const std::string& body)
         case char2int("hero"):
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
-            map.set_center_pos(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
-            network.set_pdir(val[2]);
+            map.center_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
+            network.set_pdir(val[2]);//direction the player is facing
             resource_manager.set_mpath(val[11]);
-            resource_manager.load_graphic(val[10], Graphic::HERO);
+            resource_manager.load_graphic(val[10], Graphic::CHARACTER);
             std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
         case char2int("town"):
         {
+            //FINISHED
             std::vector<std::string> val = split(line.substr(colon+1));
             map.set_map_size(sf::Vector2u(std::stoul(val[0]), std::stoul(val[1])));
             resource_manager.load_graphic(val[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(val[2]));
             map.set_map_name(val[3]);
             map.set_map_pvp(val[4]);
-            //val[5] battle background
+            //val[5] is battle background(load elsewhere)
             map.set_map_id(val[6]);
             break;
         }
         case char2int("lastevent"):
         {
+            //FINISHED
             network.set_ev(line.substr(colon+1));
             break;
         }
         case char2int("maxchat"):
         {
+            //FINISHED
             network.set_lastch(line.substr(colon+1));
             break;
         }
         case char2int("maxcchat"):
         {
+            //FINISHED
             network.set_lastcch(line.substr(colon+1));
             break;
         }
@@ -158,11 +162,13 @@ void Engine::process_response(const std::string& body)
         }
         case char2int("sqltime"):
         {
+            //FINISHED
             sf::sleep(sf::microseconds(std::stof(line.substr(colon+1)) * 1000));
             break;
         }
         case char2int("end"):
         {
+            //FINISHED
             alldata = true;
             break;
         }
@@ -198,19 +204,19 @@ void Engine::input_handle()
             switch(event.key.code)
             {
             case sf::Keyboard::W:
-                keyboard.set_up(true);
+                keyboard.up = true;
                 break;
             case sf::Keyboard::A:
-                keyboard.set_left(true);
+                keyboard.left = true;
                 break;
             case sf::Keyboard::S:
-                keyboard.set_down(true);
+                keyboard.down = true;
                 break;
             case sf::Keyboard::D:
-                keyboard.set_right(true);
+                keyboard.right = true;
                 break;
             case sf::Keyboard::Escape:
-                loop = false;
+                quit = true;
                 break;
             default:
                 break;
@@ -222,16 +228,16 @@ void Engine::input_handle()
             switch(event.key.code)
             {
             case sf::Keyboard::W:
-                keyboard.set_up(false);
+                keyboard.up = false;
                 break;
             case sf::Keyboard::A:
-                keyboard.set_left(false);
+                keyboard.left = false;
                 break;
             case sf::Keyboard::S:
-                keyboard.set_down(false);
+                keyboard.down = false;
                 break;
             case sf::Keyboard::D:
-                keyboard.set_right(false);
+                keyboard.right = false;
                 break;
             default:
                 break;
@@ -240,7 +246,7 @@ void Engine::input_handle()
         }
         case sf::Event::Closed:
         {
-            loop = false;
+            quit = true;
             break;
         }
         case sf::Event::Resized:
@@ -260,7 +266,7 @@ void Engine::game_logic()
 {
     if(keyboard.held_any_key())
         if(clock.interrupt())
-            map.move_relative(sf::Vector2i(keyboard.held_right() - keyboard.held_left(),
-                                           keyboard.held_down() - keyboard.held_up()));
+            map.center_rel(sf::Vector2i(keyboard.held_right() - keyboard.held_left(),
+                                        keyboard.held_down() - keyboard.held_up()));
     clock.update();
 }

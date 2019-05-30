@@ -13,7 +13,9 @@ public:
     sf::Time getElapsedTime() const;
     sf::Time getInterruptTime() const;
 
+    //updates interrupt timer
     void update();
+    //true only when certain amount of time have passed
     bool interrupt();
 };
 

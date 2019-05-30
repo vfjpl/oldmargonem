@@ -30,14 +30,14 @@ void Map::set_screen_size(sf::Vector2u value)
     screen_center = value/2u;
 }
 
-void Map::set_center_pos(sf::Vector2i value)
+void Map::center_to(sf::Vector2i value)
 {
     center_pos_diff = value - center_pos;
     center_old_pos = center_pos;
     center_pos = value;
 }
 
-void Map::move_relative(sf::Vector2i value)
+void Map::center_rel(sf::Vector2i value)
 {
     center_old_pos = center_pos;
     center_pos += value;

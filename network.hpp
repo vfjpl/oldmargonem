@@ -25,8 +25,10 @@ public:
     void set_lastcch(const std::string& value);
     void set_bseq(const std::string& value);
     void set_pdir(const std::string& value);
+    //give you response from game server
     const std::string& get_response() const;
 
+    //logs in and sets necessary cookies(currently you have to give it sha1 hashed password)
     void login(const std::string& login, const std::string& password);
     void logout();
 

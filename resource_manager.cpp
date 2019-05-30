@@ -20,11 +20,17 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
     std::string path;
     switch(what)
     {
-    case HERO:
-        path = "obrazki/postacie";
-        break;
     case MAP:
         path = "obrazki/miasta/";
+        break;
+    case CHARACTER:
+        path = "obrazki/postacie";
+        break;
+    case ITEM:
+        path = "obrazki/itemy";
+        break;
+    case NPC:
+        path = "obrazki/npc";
         break;
     }
 

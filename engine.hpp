@@ -16,7 +16,7 @@ class Engine
     Resource_Manager resource_manager;
     MyClock clock;
     MyKeyboard keyboard;
-    bool loop = true;
+    bool quit = false;
 
 public:
     void main();

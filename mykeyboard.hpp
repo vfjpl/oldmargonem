@@ -3,23 +3,18 @@
 
 class MyKeyboard
 {
-    bool up = false;
-    bool prev_up = false;
-    bool left = false;
-    bool prev_left = false;
-    bool down = false;
-    bool prev_down = false;
-    bool right = false;
-    bool prev_right = false;
-
 public:
+    bool up = false;
+    bool pr_up = false;
+    bool left = false;
+    bool pr_left = false;
+    bool down = false;
+    bool pr_down = false;
+    bool right = false;
+    bool pr_right = false;
+
+
     void update();
-
-    void set_up(bool value);
-    void set_left(bool value);
-    void set_down(bool value);
-    void set_right(bool value);
-
     bool any_key() const;
     bool held_any_key() const;
 
