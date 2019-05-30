@@ -80,6 +80,7 @@ void Network::logout()
 {
     request = sf::Http::Request();
     fifo = std::queue<std::string>();
+    ml.clear();
     cookie.clear();
     pid.clear();
     ev.clear();
@@ -89,12 +90,12 @@ void Network::logout()
     pdir.clear();
 }
 
-void Network::queue_load_sequence()
+void Network::queue_move(sf::Vector2i value)
 {
-    fifo.emplace("initlvl=1&build=1007&task=init");
-    fifo.emplace("initlvl=2&task=init");
-    fifo.emplace("initlvl=3&task=init");
-    fifo.emplace("initlvl=4&task=init");
+    if(ml.empty())
+        ml = std::to_string(value.x) + ',' + std::to_string(value.y);
+    else
+        ml += ';' + std::to_string(value.x) + ',' + std::to_string(value.y);
 }
 
 void Network::queue_command(const std::string& command)
@@ -107,9 +108,19 @@ void Network::send_command(sf::Time a)
     //TODO BATTLE
     std::string cmd;
     if(!fifo.empty())
+    {
         cmd = fifo.front();
+        fifo.pop();
+    }
+    else if(!ml.empty())
+    {
+        cmd = "dir=" + pdir + "&ml=" + ml;
+        ml.clear();
+    }
     else
+    {
         cmd = "task=_";
+    }
 
     request.setUri("db.php?"+
                    cmd+
@@ -121,5 +132,12 @@ void Network::send_command(sf::Time a)
                    "&pdir="+pdir+
                    "&a="+std::to_string(a.asMicroseconds()));
     response = http.sendRequest(request);
-    fifo.pop();
+}
+
+void Network::load_sequence()
+{
+    fifo.emplace("initlvl=1&build=1007&task=init");
+    fifo.emplace("initlvl=2&task=init");
+    fifo.emplace("initlvl=3&task=init");
+    fifo.emplace("initlvl=4&task=init");
 }

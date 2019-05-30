@@ -2,6 +2,7 @@
 #define NETWORK_HPP_INCLUDED
 
 #include <SFML/Network/Http.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <queue>
 
 class Network
@@ -10,6 +11,7 @@ class Network
     sf::Http::Request request;
     sf::Http::Response response;
     std::queue<std::string> fifo;
+    std::string ml;
     std::string cookie;
     std::string pid;
     std::string ev;
@@ -32,9 +34,11 @@ public:
     void login(const std::string& login, const std::string& password);
     void logout();
 
-    void queue_load_sequence();
+    void queue_move(sf::Vector2i value);
     void queue_command(const std::string& command);
     void send_command(sf::Time a);
+
+    void load_sequence();
 };
 
 #endif // NETWORK_HPP_INCLUDED

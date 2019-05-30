@@ -59,6 +59,8 @@ void Engine::main()
 
     while(!quit)
     {
+        network.send_command(clock.getElapsedTime());
+        process_response(network.get_response());
         input_handle();
         game_logic();
         map.draw(window, clock.getInterruptTime());
@@ -89,7 +91,7 @@ void Engine::setup_window(bool fullscreen)
 
 void Engine::load_game()
 {
-    network.queue_load_sequence();
+    network.load_sequence();
     network.send_command(clock.getElapsedTime());
     process_response(network.get_response());
     network.send_command(clock.getElapsedTime());
@@ -116,6 +118,7 @@ void Engine::process_response(const std::string& body)
         {
             std::vector<std::string> val = splitv(line.substr(colon+1));
             map.center_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
+            hero.move_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
             network.set_pdir(val[2]);//direction the player is facing
             resource_manager.set_mpath(val[11]);
             resource_manager.load_graphic(val[10], Graphic::CHARACTER);
@@ -266,7 +269,12 @@ void Engine::game_logic()
 {
     if(keyboard.held_any_key())
         if(clock.interrupt())
-            map.center_rel(sf::Vector2i(keyboard.held_right() - keyboard.held_left(),
-                                        keyboard.held_down() - keyboard.held_up()));
+        {
+            sf::Vector2i temp(keyboard.held_right() - keyboard.held_left(),
+                              keyboard.held_down() - keyboard.held_up());
+            map.center_rel(temp);
+            hero.move_rel(temp);
+            network.queue_move(hero.get_position());
+        }
     clock.update();
 }

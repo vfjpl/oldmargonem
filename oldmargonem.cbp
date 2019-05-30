@@ -41,6 +41,8 @@
 		<Unit filename="config.hpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />
+		<Unit filename="hero.cpp" />
+		<Unit filename="hero.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="map.cpp" />
 		<Unit filename="map.hpp" />
