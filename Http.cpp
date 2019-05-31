@@ -276,7 +276,7 @@ void Http::Response::parseFields(std::istream &in)
                 value.erase(value.size() - 1);
 
             // Add the field
-            if (m_fields.count(field))
+            if (!m_fields.count(field))
             {
                 m_fields[field] = value;
             }
@@ -284,7 +284,7 @@ void Http::Response::parseFields(std::istream &in)
             {
                 sf::Uint8 i = 0;
                 for (;;++i)
-                    if (m_fields.count(field + std::to_string(i)))
+                    if (!m_fields.count(field + std::to_string(i)))
                         break;
                 m_fields[field + std::to_string(i)] = value;
             }
