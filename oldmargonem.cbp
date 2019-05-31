@@ -38,6 +38,7 @@
 			<Add library="sfml-system" />
 		</Linker>
 		<Unit filename="Http.cpp" />
+		<Unit filename="Http.hpp" />
 		<Unit filename="config.hpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />

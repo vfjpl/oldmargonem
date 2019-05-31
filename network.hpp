@@ -1,7 +1,7 @@
 #ifndef NETWORK_HPP_INCLUDED
 #define NETWORK_HPP_INCLUDED
 
-#include <SFML/Network/Http.hpp>
+#include "Http.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <queue>
 

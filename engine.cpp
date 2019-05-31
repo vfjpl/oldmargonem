@@ -54,7 +54,7 @@ void Engine::main()
     setup_window(true);
     map.set_screen_size(window.getSize());
 
-    network.login();
+    network.login("","");
     load_game();
 
     while(!quit)

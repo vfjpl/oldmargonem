@@ -25,7 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Network/Http.hpp>
+#include "Http.hpp"
 #include <SFML/System/Err.hpp>
 #include <sstream>
 #include <limits>
@@ -60,13 +60,11 @@ void Http::Request::setMethod(Http::Request::Method method)
 ////////////////////////////////////////////////////////////
 void Http::Request::setUri(const std::string& uri)
 {
+    m_uri = uri;
+
     // Make sure it starts with a '/'
-    if (uri.empty())
-        m_uri = '/';
-    else if (uri[0] != '/')
-        m_uri = '/' + uri;
-    else
-        m_uri = uri;
+    if (m_uri.empty() || (m_uri[0] != '/'))
+        m_uri.insert(0, "/");
 }
 
 
@@ -247,7 +245,7 @@ void Http::Response::parse(const std::string& data)
             // Copy the actual content data
             std::istreambuf_iterator<char> it(in);
             std::istreambuf_iterator<char> itEnd;
-            for (std::size_t i = 0; ((i < length) && (it != itEnd)); ++i)
+            for (std::size_t i = 0; ((i < length) && (it != itEnd)); i++)
                 m_body.push_back(*it++);
         }
 
@@ -275,10 +273,10 @@ void Http::Response::parseFields(std::istream &in)
 
             // Remove any trailing \r
             if (!value.empty() && (*value.rbegin() == '\r'))
-                value.pop_back();
+                value.erase(value.size() - 1);
 
             // Add the field
-            if (m_fields.find(field) == m_fields.end())
+            if (m_fields.count(field))
             {
                 m_fields[field] = value;
             }
@@ -286,7 +284,7 @@ void Http::Response::parseFields(std::istream &in)
             {
                 sf::Uint8 i = 0;
                 for (;;++i)
-                    if (m_fields.find(field + std::to_string(i)) == m_fields.end())
+                    if (m_fields.count(field + std::to_string(i)))
                         break;
                 m_fields[field + std::to_string(i)] = value;
             }
@@ -301,6 +299,14 @@ m_host(),
 m_port(0)
 {
 
+}
+
+
+////////////////////////////////////////////////////////////
+Http::~Http()
+{
+    // Close the connection
+    m_connection.disconnect();
 }
 
 
@@ -325,8 +331,8 @@ void Http::setHost(const std::string& host, unsigned short port)
     {
         // HTTPS protocol -- unsupported (requires encryption and certificates and stuff...)
         err() << "HTTPS protocol is not supported by sf::Http\n";
-        m_hostName.clear();
-        m_port = 0;
+        m_hostName = "";
+        m_port     = 0;
     }
     else
     {
@@ -337,14 +343,18 @@ void Http::setHost(const std::string& host, unsigned short port)
 
     // Remove any trailing '/' from the host name
     if (!m_hostName.empty() && (*m_hostName.rbegin() == '/'))
-        m_hostName.pop_back();
+        m_hostName.erase(m_hostName.size() - 1);
 
     m_host = IpAddress(m_hostName);
+
+    // Connect the socket to the host
+    if (m_connection.connect(m_host, m_port, sf::Time::Zero) != Socket::Done)
+        err() << "Connection to " << m_host << ':' << m_port << "failed\n";
 }
 
 
 ////////////////////////////////////////////////////////////
-Http::Response Http::sendRequest(const Http::Request& request, Time timeout)
+Http::Response Http::sendRequest(const Http::Request& request)
 {
     // First make sure that the request is valid -- add missing mandatory fields
     Request toSend(request);
@@ -372,39 +382,32 @@ Http::Response Http::sendRequest(const Http::Request& request, Time timeout)
     }
     if ((toSend.m_majorVersion * 10 + toSend.m_minorVersion >= 11) && !toSend.hasField("Connection"))
     {
-        toSend.setField("Connection", "close");
+        toSend.setField("Connection", "keep-alive");
     }
 
     // Prepare the response
     Response received;
 
-    // Connect the socket to the host
-    if (m_connection.connect(m_host, m_port, timeout) == Socket::Done)
+    // Convert the request to string and send it through the connected socket
+    std::string requestStr = toSend.prepare();
+
+    if (!requestStr.empty())
     {
-        // Convert the request to string and send it through the connected socket
-        std::string requestStr = toSend.prepare();
-
-        if (!requestStr.empty())
+        // Send it through the socket
+        if (m_connection.send(requestStr.c_str(), requestStr.size()) == Socket::Done)
         {
-            // Send it through the socket
-            if (m_connection.send(requestStr.c_str(), requestStr.size()) == Socket::Done)
+            // Wait for the server's response
+            std::string receivedStr;
+            std::size_t size = 0;
+            char buffer[1024];
+            while (m_connection.receive(buffer, sizeof(buffer), size) == Socket::Done)
             {
-                // Wait for the server's response
-                std::string receivedStr;
-                std::size_t size = 0;
-                char buffer[1024];
-                while (m_connection.receive(buffer, sizeof(buffer), size) == Socket::Done)
-                {
-                    receivedStr.append(buffer, buffer + size);
-                }
-
-                // Build the Response object from the received data
-                received.parse(receivedStr);
+                receivedStr.append(buffer, buffer + size);
             }
-        }
 
-        // Close the connection
-        m_connection.disconnect();
+            // Build the Response object from the received data
+            received.parse(receivedStr);
+        }
     }
 
     return received;
