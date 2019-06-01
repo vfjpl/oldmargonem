@@ -31,6 +31,16 @@
 #include <limits>
 
 
+namespace
+{
+    std::size_t getPacketSize(std::string& str)
+    {
+        std::size_t pos = str.find("Content-Length") + 16;
+        return std::stoul(str.substr(pos, str.find('\r', pos) - pos));
+    }
+}
+
+
 namespace sf
 {
 ////////////////////////////////////////////////////////////
@@ -348,8 +358,7 @@ void Http::setHost(const std::string& host, unsigned short port)
     m_host = IpAddress(m_hostName);
 
     // Connect the socket to the host
-    if (m_connection.connect(m_host, m_port, sf::Time::Zero) != Socket::Done)
-        err() << "Connection to " << m_host << ':' << m_port << "failed\n";
+    m_connection.connect(m_host, m_port, sf::Time::Zero);
 }
 
 
@@ -400,9 +409,17 @@ Http::Response Http::sendRequest(const Http::Request& request)
             std::string receivedStr;
             std::size_t size = 0;
             char buffer[1024];
-            while (m_connection.receive(buffer, sizeof(buffer), size) == Socket::Done)
+
+            m_connection.receive(buffer, sizeof(buffer), size);
+            receivedStr.append(buffer, buffer + size);
+            std::size_t packetSize = getPacketSize(receivedStr);
+            std::size_t receivedSize = size;
+
+            while (receivedSize < packetSize)
             {
+                m_connection.receive(buffer, sizeof(buffer), size);
                 receivedStr.append(buffer, buffer + size);
+                receivedSize += size;
             }
 
             // Build the Response object from the received data
