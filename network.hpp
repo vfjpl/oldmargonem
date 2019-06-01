@@ -32,7 +32,6 @@ public:
 
     //logs in and sets necessary cookies(currently you have to give it sha1 hashed password)
     void login(const std::string& login, const std::string& password);
-    void logout();
 
     void queue_move(sf::Vector2i value);
     void queue_command(const std::string& command);

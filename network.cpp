@@ -14,8 +14,8 @@ std::string get_cookie(const std::string& field)
 }
 std::string get_pid_value(const std::string& body)
 {
-    size_t size = body.find("value") + 7;
-    return body.substr(size, body.find('"', size) - size);
+    size_t pos = body.find("value") + 7;
+    return body.substr(pos, body.find('"', pos) - pos);
 }
 }
 
@@ -74,20 +74,6 @@ void Network::login(const std::string& login, const std::string& password)
     cookie += get_cookie(response_login.getField("Set-Cookie1"));
     cookie += "mchar_id=" + pid;
     request.setField("Cookie", cookie);
-}
-
-void Network::logout()
-{
-    request = sf::Http::Request();
-    fifo = std::queue<std::string>();
-    ml.clear();
-    cookie.clear();
-    pid.clear();
-    ev.clear();
-    lastch.clear();
-    lastcch.clear();
-    bseq.clear();
-    pdir.clear();
 }
 
 void Network::queue_move(sf::Vector2i value)

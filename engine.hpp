@@ -18,7 +18,6 @@ class Engine
     Resource_Manager resource_manager;
     MyClock clock;
     MyKeyboard keyboard;
-    bool quit = false;
 
 public:
     void main();

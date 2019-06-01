@@ -38,6 +38,10 @@ namespace
         std::size_t pos = str.find("Content-Length") + 16;
         return std::stoul(str.substr(pos, str.find('\r', pos) - pos));
     }
+    std::size_t getHeaderSize(std::string& str)
+    {
+        return str.find("\r\n\r\n") + 4;
+    }
 }
 
 
@@ -413,7 +417,7 @@ Http::Response Http::sendRequest(const Http::Request& request)
             m_connection.receive(buffer, sizeof(buffer), size);
             receivedStr.append(buffer, buffer + size);
             std::size_t packetSize = getPacketSize(receivedStr);
-            std::size_t receivedSize = size;
+            std::size_t receivedSize = size - getHeaderSize(receivedStr);
 
             while (receivedSize < packetSize)
             {

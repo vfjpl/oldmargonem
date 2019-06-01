@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cstring>
 
+#include <SFML/System/Err.hpp>
+
 namespace
 {
 int str2int(const std::string& str)
@@ -51,13 +53,13 @@ std::vector<std::string> splitv(const std::string& parm)
 
 void Engine::main()
 {
-    setup_window(true);
+    setup_window(false);
     map.set_screen_size(window.getSize());
 
-    network.login("","");
+    network.login();
     load_game();
 
-    while(!quit)
+    while(window.isOpen())
     {
         network.send_command(clock.getElapsedTime());
         process_response(network.get_response());
@@ -66,8 +68,6 @@ void Engine::main()
         map.draw(window, clock.getInterruptTime());
         window.display();
     }
-
-    network.logout();
 }
 
 void Engine::setup_window(bool fullscreen)
@@ -104,6 +104,7 @@ void Engine::load_game()
 
 void Engine::process_response(const std::string& body)
 {
+    sf::err() << body << std::endl;
     bool alldata = false;
     for(size_t old_pos = 0;;)
     {
@@ -166,13 +167,17 @@ void Engine::process_response(const std::string& body)
         case char2int("sqltime"):
         {
             //FINISHED
-            sf::sleep(sf::microseconds(std::stof(line.substr(colon+1)) * 1000));
             break;
         }
         case char2int("end"):
         {
             //FINISHED
             alldata = true;
+            break;
+        }
+        case char2int(""):
+        {
+            //FINISHED
             break;
         }
         default:
@@ -196,7 +201,6 @@ void Engine::process_response(const std::string& body)
 
 void Engine::input_handle()
 {
-    keyboard.update();
     sf::Event event;
     while(window.pollEvent(event))
     {
@@ -219,7 +223,7 @@ void Engine::input_handle()
                 keyboard.right = true;
                 break;
             case sf::Keyboard::Escape:
-                quit = true;
+                window.close();
                 break;
             default:
                 break;
@@ -249,7 +253,7 @@ void Engine::input_handle()
         }
         case sf::Event::Closed:
         {
-            quit = true;
+            window.close();
             break;
         }
         case sf::Event::Resized:
@@ -267,11 +271,11 @@ void Engine::input_handle()
 
 void Engine::game_logic()
 {
-    if(keyboard.held_any_key())
+    if(keyboard.anyKey())
         if(clock.interrupt())
         {
-            sf::Vector2i temp(keyboard.held_right() - keyboard.held_left(),
-                              keyboard.held_down() - keyboard.held_up());
+            sf::Vector2i temp(keyboard.right - keyboard.left,
+                              keyboard.down - keyboard.up);
             map.center_rel(temp);
             hero.move_rel(temp);
             network.queue_move(hero.get_position());
