@@ -1,5 +1,6 @@
 #include "network.hpp"
 #include "config.hpp"
+#include <sys/time.h>
 
 namespace
 {
@@ -16,6 +17,13 @@ std::string get_pid_value(const std::string& body)
 {
     size_t pos = body.find("value") + 7;
     return body.substr(pos, body.find('"', pos) - pos);
+}
+std::string get_time()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return std::to_string(1000000u * tv.tv_sec + tv.tv_usec).substr(5, 10);
+
 }
 }
 
@@ -89,7 +97,7 @@ void Network::queue_command(const std::string& command)
     fifo.push(command);
 }
 
-void Network::send_command(sf::Time a)
+void Network::send_command()
 {
     //TODO BATTLE
     std::string cmd;
@@ -116,7 +124,7 @@ void Network::send_command(sf::Time a)
                    "&lastcch="+lastcch+
                    "&bseq="+bseq+
                    "&pdir="+pdir+
-                   "&a="+std::to_string(a.asMicroseconds()));
+                   "&a="+get_time());
     response = http.sendRequest(request);
 }
 

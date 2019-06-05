@@ -35,7 +35,7 @@ public:
 
     void queue_move(sf::Vector2i value);
     void queue_command(const std::string& command);
-    void send_command(sf::Time a);
+    void send_command();
 
     void load_sequence();
 };
