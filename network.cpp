@@ -22,8 +22,8 @@ std::string get_time()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return std::to_string(1000000u * tv.tv_sec + tv.tv_usec).substr(5, 10);
-
+    unsigned long rev = (tv.tv_sec*10000) + (tv.tv_usec/100);
+    return std::to_string(rev).substr(5);
 }
 }
 
