@@ -18,7 +18,7 @@ std::string get_pid_value(const std::string& body)
     size_t pos = body.find("value") + 7;
     return body.substr(pos, body.find('"', pos) - pos);
 }
-std::string get_time()
+std::string get_time_string()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -124,7 +124,7 @@ void Network::send_command()
                    "&lastcch="+lastcch+
                    "&bseq="+bseq+
                    "&pdir="+pdir+
-                   "&a="+get_time());
+                   "&a="+get_time_string());
     response = http.sendRequest(request);
 }
 

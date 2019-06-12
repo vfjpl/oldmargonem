@@ -35,12 +35,21 @@ namespace
 {
     std::size_t getPacketSize(std::string& str)
     {
-        std::size_t pos = str.find("Content-Length") + 16;
+        std::size_t pos = str.find("Content-Length");
+        if(pos == std::string::npos)
+            return std::string::npos;
+        pos += 16;//lenght of "Content-Lenght" string
         return std::stoul(str.substr(pos, str.find('\r', pos) - pos));
     }
     std::size_t getHeaderSize(std::string& str)
     {
         return str.find("\r\n\r\n") + 4;
+    }
+    bool isEnd(std::string& str)
+    {
+        if(*str.rbegin() == 'd')
+            return true;
+        return false;
     }
 }
 
@@ -417,15 +426,26 @@ Http::Response Http::sendRequest(const Http::Request& request)
             m_connection.receive(buffer, sizeof(buffer), size);
             receivedStr.append(buffer, buffer + size);
             std::size_t packetSize = getPacketSize(receivedStr);
-            std::size_t receivedSize = size - getHeaderSize(receivedStr);
-
-            while (receivedSize < packetSize)
+            if(packetSize != std::string::npos)
             {
-                m_connection.receive(buffer, sizeof(buffer), size);
-                receivedStr.append(buffer, buffer + size);
-                receivedSize += size;
+                std::size_t receivedSize = size - getHeaderSize(receivedStr);
+                while (receivedSize < packetSize)
+                {
+                    m_connection.receive(buffer, sizeof(buffer), size);
+                    receivedStr.append(buffer, buffer + size);
+                    receivedSize += size;
+                }
             }
-
+            else
+            {
+                //no Content-Lenght field
+                //try to quess
+                while(!isEnd(receivedStr))
+                {
+                    m_connection.receive(buffer, sizeof(buffer), size);
+                    receivedStr.append(buffer, buffer + size);
+                }
+            }
             // Build the Response object from the received data
             received.parse(receivedStr);
         }
