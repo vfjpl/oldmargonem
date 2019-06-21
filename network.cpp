@@ -5,6 +5,7 @@
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPCookie.h>
 #include <sys/time.h>
+#include <sstream>
 
 namespace
 {
@@ -13,9 +14,9 @@ std::string sha1(const std::string& password)
     //TODO SHA1
     return password;
 }
-std::string get_pid_value(const Poco::Net::HTMLForm& form)
+std::string get_pid_value(const std::stringstream& ss)
 {
-    const std::string &temp = form.begin()->second;
+    const std::string &temp = ss.str();
     size_t pos = temp.find("value") + 7;
     return temp.substr(pos, temp.find('"', pos) - pos);
 }
@@ -60,6 +61,7 @@ void Network::set_pdir(const std::string& value)
 
 void Network::login(const std::string& login, const std::string& password)
 {
+    //send
     Poco::Net::HTMLForm login_form;
     login_form.add("l", login);
     login_form.add("ph", sha1(password));
@@ -68,10 +70,10 @@ void Network::login(const std::string& login, const std::string& password)
     login_form.prepareSubmit(login_request);
     login_form.write(login_session.sendRequest(login_request));
 
+    //receive
     Poco::Net::HTTPResponse response;
-    Poco::Net::HTMLForm response_form;
-    response_form.read(login_session.receiveResponse(response));
-
+    std::stringstream body;
+    login_session.receiveResponse(response) >> body.rdbuf();
 
     //INIT
     pdir = '0';
@@ -79,7 +81,7 @@ void Network::login(const std::string& login, const std::string& password)
     lastcch = '0';
     lastch = '0';
     ev = '0';
-    pid = get_pid_value(response_form);
+    pid = get_pid_value(body);
 
     //Cookies
     Poco::Net::NameValueCollection cookies;
@@ -143,5 +145,6 @@ void Network::send_command()
 
     session.sendRequest(request);
     Poco::Net::HTTPResponse response;
-    session.receiveResponse(response);
+
+    //std::cout << var.toString();
 }

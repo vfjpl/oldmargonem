@@ -18,7 +18,7 @@ void MyClock::update()
     last_clock = now;
 }
 
-bool MyClock::interrupt()
+bool MyClock::move_interrupt()
 {
     if(move_time.asSeconds() < 1/MOVEMENT_SPEED)
         return false;

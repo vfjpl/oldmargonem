@@ -51,7 +51,7 @@ Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-    network.login("", "");
+    network.login();
     load_game();
 }
 
@@ -59,7 +59,7 @@ bool Engine::run()
 {
     input_handle();
     game_logic();
-    map.draw(window, clock.getInterruptTime());
+    map.draw(window, clock.getMoveTime());
     window.display();
 
     return window.isOpen();
@@ -86,7 +86,8 @@ void Engine::setup_window(bool fullscreen)
 
 void Engine::load_game()
 {
-
+    network.queue_load_sequence();
+    network.send_command();
 }
 
 void Engine::process_response(const std::string& body)
@@ -258,7 +259,7 @@ void Engine::input_handle()
 void Engine::game_logic()
 {
     if(keyboard.anyKey())
-        if(clock.interrupt())
+        if(clock.move_interrupt())
         {
             sf::Vector2i temp = keyboard.getPosChange();
             map.center_rel(temp);
