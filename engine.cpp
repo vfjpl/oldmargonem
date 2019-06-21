@@ -1,10 +1,6 @@
 #include "engine.hpp"
-#include <SFML/System/Sleep.hpp>
 #include <SFML/Window/Event.hpp>
 #include <iostream>
-#include <cstring>
-
-#include <SFML/System/Err.hpp>
 
 namespace
 {
@@ -51,21 +47,22 @@ std::vector<std::string> splitv(const std::string& parm)
 }
 }
 
-void Engine::main()
+Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-
-    network.login();
+    network.login("", "");
     load_game();
+}
 
-    while(window.isOpen())
-    {
-        input_handle();
-        game_logic();
-        map.draw(window, clock.getInterruptTime());
-        window.display();
-    }
+bool Engine::run()
+{
+    input_handle();
+    game_logic();
+    map.draw(window, clock.getInterruptTime());
+    window.display();
+
+    return window.isOpen();
 }
 
 void Engine::setup_window(bool fullscreen)
@@ -263,8 +260,7 @@ void Engine::game_logic()
     if(keyboard.anyKey())
         if(clock.interrupt())
         {
-            sf::Vector2i temp(keyboard.right - keyboard.left,
-                              keyboard.down - keyboard.up);
+            sf::Vector2i temp = keyboard.getPosChange();
             map.center_rel(temp);
             hero.move_rel(temp);
             network.queue_move(hero.get_position());

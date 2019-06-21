@@ -1,6 +1,8 @@
 #ifndef MYKEYBOARD_HPP_INCLUDED
 #define MYKEYBOARD_HPP_INCLUDED
 
+#include <SFML/System/Vector2.hpp>
+
 class MyKeyboard
 {
 public:
@@ -10,6 +12,7 @@ public:
     bool right = false;
 
     bool anyKey() const;
+    sf::Vector2i getPosChange() const;
 };
 
-#endif // MYKEYBOARzD_HPP_INCLUDED
+#endif // MYKEYBOARD_HPP_INCLUDED

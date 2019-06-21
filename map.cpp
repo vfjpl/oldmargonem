@@ -52,6 +52,7 @@ void Map::set_texture(const sf::Texture& texture)
     p_per_tile /= (map_size.x + map_size.y);
     p_correction = p_per_tile/2;
 
+    //position should be now set
     center_view();
 }
 

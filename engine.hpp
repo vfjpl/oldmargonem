@@ -20,7 +20,8 @@ class Engine
     MyKeyboard keyboard;
 
 public:
-    void main();
+    Engine();
+    bool run();
 
 private:
     void setup_window(bool fullscreen);

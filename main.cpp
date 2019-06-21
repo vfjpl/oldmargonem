@@ -3,6 +3,6 @@
 int main()
 {
     Engine engine;
-    engine.main();
+    while(engine.run());
     return EXIT_SUCCESS;
 }
