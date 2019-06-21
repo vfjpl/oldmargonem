@@ -14,18 +14,17 @@ std::string sha1(const std::string& password)
     //TODO SHA1
     return password;
 }
-std::string get_pid_value(const std::stringstream& ss)
+std::string get_pid_value(const std::string& body)
 {
-    const std::string &temp = ss.str();
-    size_t pos = temp.find("value") + 7;
-    return temp.substr(pos, temp.find('"', pos) - pos);
+    size_t pos = body.find("value") + 7;
+    return body.substr(pos, body.find('"', pos) - pos);
 }
 std::string get_time_string()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    unsigned long rev = tv.tv_usec;
-    return std::to_string(rev);
+    unsigned long rev = (tv.tv_sec*10000);
+    return std::to_string(rev).substr(5);
 }
 }
 
@@ -71,8 +70,8 @@ void Network::login(const std::string& login, const std::string& password)
     login_form.write(login_session.sendRequest(login_request));
 
     //receive
-    Poco::Net::HTTPResponse response;
     std::stringstream body;
+    Poco::Net::HTTPResponse response;
     login_session.receiveResponse(response) >> body.rdbuf();
 
     //INIT
@@ -81,7 +80,7 @@ void Network::login(const std::string& login, const std::string& password)
     lastcch = '0';
     lastch = '0';
     ev = '0';
-    pid = get_pid_value(body);
+    pid = get_pid_value(body.str());
 
     //Cookies
     Poco::Net::NameValueCollection cookies;
@@ -114,7 +113,7 @@ void Network::queue_load_sequence()
     fifo.emplace("initlvl=4&task=init");
 }
 
-void Network::send_command()
+std::istream& Network::send_command()
 {
     //TODO BATTLE
     std::string cmd;
@@ -145,6 +144,5 @@ void Network::send_command()
 
     session.sendRequest(request);
     Poco::Net::HTTPResponse response;
-
-    //std::cout << var.toString();
+    return session.receiveResponse(response);
 }

@@ -51,15 +51,16 @@ Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-    network.login();
+    network.login("", "");
     load_game();
 }
 
 bool Engine::run()
 {
+    network_handle();
     input_handle();
     game_logic();
-    map.draw(window, clock.getMoveTime());
+    draw_window();
     window.display();
 
     return window.isOpen();
@@ -87,10 +88,13 @@ void Engine::setup_window(bool fullscreen)
 void Engine::load_game()
 {
     network.queue_load_sequence();
-    network.send_command();
+    network_handle();
+    network_handle();
+    network_handle();
+    network_handle();
 }
 
-void Engine::process_response(const std::string& body)
+void Engine::network_handle()
 {
     bool alldata = false;
     for(size_t old_pos = 0;;)
@@ -267,4 +271,9 @@ void Engine::game_logic()
             network.queue_move(hero.get_position());
         }
     clock.update();
+}
+
+void Engine::draw_window()
+{
+    map.draw(window, clock.getMoveTime());
 }

@@ -27,9 +27,11 @@ private:
     void setup_window(bool fullscreen);
     void load_game();
 
-    void process_response(const std::string& body);
+
+    void network_handle();
     void input_handle();
     void game_logic();
+    void draw_window();
 };
 
 #endif // ENGINE_HPP_INCLUDED
