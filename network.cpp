@@ -1,5 +1,9 @@
 #include "network.hpp"
 #include "config.hpp"
+#include <Poco/Net/NameValueCollection.h>
+#include <Poco/Net/HTMLForm.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/Net/HTTPCookie.h>
 #include <sys/time.h>
 
 namespace
@@ -9,27 +13,24 @@ std::string sha1(const std::string& password)
     //TODO SHA1
     return password;
 }
-std::string get_cookie(const std::string& field)
+std::string get_pid_value(const Poco::Net::HTMLForm& form)
 {
-    return field.substr(0, field.find(' ') + 1);
-}
-std::string get_pid_value(const std::string& body)
-{
-    size_t pos = body.find("value") + 7;
-    return body.substr(pos, body.find('"', pos) - pos);
+    const std::string &temp = form.begin()->second;
+    size_t pos = temp.find("value") + 7;
+    return temp.substr(pos, temp.find('"', pos) - pos);
 }
 std::string get_time_string()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    unsigned long rev = (tv.tv_sec*10000) + (tv.tv_usec/100);
-    return std::to_string(rev).substr(5);
+    unsigned long rev = tv.tv_usec;
+    return std::to_string(rev);
 }
 }
 
 Network::Network()
 {
-    http.setHost(GAME_ADDRES);
+    session.setHost(GAME_ADDRES);
 }
 
 void Network::set_ev(const std::string& value)
@@ -57,18 +58,20 @@ void Network::set_pdir(const std::string& value)
     pdir = value;
 }
 
-const std::string& Network::get_response() const
-{
-    return response.getBody();
-}
-
 void Network::login(const std::string& login, const std::string& password)
 {
-    sf::Http http_login(LOGIN_ADDRES);
-    sf::Http::Request request_login("ajax/logon.php?t=login",
-                                    sf::Http::Request::Post,
-                                    "l=" + login + "&ph=" + sha1(password));
-    sf::Http::Response response_login = http_login.sendRequest(request_login);
+    Poco::Net::HTMLForm login_form;
+    login_form.add("l", login);
+    login_form.add("ph", sha1(password));
+    Poco::Net::HTTPClientSession login_session(LOGIN_ADDRES);
+    Poco::Net::HTTPRequest login_request(Poco::Net::HTTPRequest::HTTP_POST, "/ajax/logon.php?t=login");
+    login_form.prepareSubmit(login_request);
+    login_form.write(login_session.sendRequest(login_request));
+
+    Poco::Net::HTTPResponse response;
+    Poco::Net::HTMLForm response_form;
+    response_form.read(login_session.receiveResponse(response));
+
 
     //INIT
     pdir = '0';
@@ -76,12 +79,16 @@ void Network::login(const std::string& login, const std::string& password)
     lastcch = '0';
     lastch = '0';
     ev = '0';
-    pid = get_pid_value(response_login.getBody());
-    cookie = get_cookie(response_login.getField("Set-Cookie"));
-    cookie += get_cookie(response_login.getField("Set-Cookie0"));
-    cookie += get_cookie(response_login.getField("Set-Cookie1"));
-    cookie += "mchar_id=" + pid;
-    request.setField("Cookie", cookie);
+    pid = get_pid_value(response_form);
+
+    //Cookies
+    Poco::Net::NameValueCollection cookies;
+    std::vector<Poco::Net::HTTPCookie> cookies_vec;
+    response.getCookies(cookies_vec);
+    for(auto &i : cookies_vec)
+        cookies.add(i.getName(), i.getValue());
+    cookies.add("mchar_id", pid);
+    request.setCookies(cookies);
 }
 
 void Network::queue_move(sf::Vector2i value)
@@ -97,6 +104,14 @@ void Network::queue_command(const std::string& command)
     fifo.push(command);
 }
 
+void Network::queue_load_sequence()
+{
+    fifo.emplace("initlvl=1&build=1007&task=init");
+    fifo.emplace("initlvl=2&task=init");
+    fifo.emplace("initlvl=3&task=init");
+    fifo.emplace("initlvl=4&task=init");
+}
+
 void Network::send_command()
 {
     //TODO BATTLE
@@ -108,7 +123,7 @@ void Network::send_command()
     }
     else if(!ml.empty())
     {
-        cmd = "dir=" + pdir + "&ml=" + ml;
+        cmd = "dir=" + pdir + "&ml=" + ml + "&task=go";
         ml.clear();
     }
     else
@@ -116,7 +131,7 @@ void Network::send_command()
         cmd = "task=_";
     }
 
-    request.setUri("db.php?"+
+    request.setURI("/db.php?"+
                    cmd+
                    "&pid="+pid+
                    "&ev="+ev+
@@ -125,13 +140,8 @@ void Network::send_command()
                    "&bseq="+bseq+
                    "&pdir="+pdir+
                    "&a="+get_time_string());
-    response = http.sendRequest(request);
-}
 
-void Network::load_sequence()
-{
-    fifo.emplace("initlvl=1&build=1007&task=init");
-    fifo.emplace("initlvl=2&task=init");
-    fifo.emplace("initlvl=3&task=init");
-    fifo.emplace("initlvl=4&task=init");
+    session.sendRequest(request);
+    Poco::Net::HTTPResponse response;
+    session.receiveResponse(response);
 }

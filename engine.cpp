@@ -56,13 +56,11 @@ void Engine::main()
     setup_window(false);
     map.set_screen_size(window.getSize());
 
-    network.login("", "");
+    network.login();
     load_game();
 
     while(window.isOpen())
     {
-        network.send_command();
-        process_response(network.get_response());
         input_handle();
         game_logic();
         map.draw(window, clock.getInterruptTime());
@@ -91,20 +89,11 @@ void Engine::setup_window(bool fullscreen)
 
 void Engine::load_game()
 {
-    network.load_sequence();
-    network.send_command();
-    process_response(network.get_response());
-    network.send_command();
-    process_response(network.get_response());
-    network.send_command();
-    process_response(network.get_response());
-    network.send_command();
-    process_response(network.get_response());
+
 }
 
 void Engine::process_response(const std::string& body)
 {
-    sf::err() << body << std::endl;
     bool alldata = false;
     for(size_t old_pos = 0;;)
     {

@@ -57,7 +57,7 @@ void Map::set_texture(const sf::Texture& texture)
 
 void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)
 {
-    if(move_fraction.asSeconds() < INTERRUPT_TIME)
+    if(move_fraction.asSeconds() < 1/MOVEMENT_SPEED)
         center_view_smooth(move_fraction);
     else
         center_view();

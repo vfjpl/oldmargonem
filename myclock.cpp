@@ -20,7 +20,7 @@ void MyClock::update()
 
 bool MyClock::interrupt()
 {
-    if(interrupt_time.asSeconds() < INTERRUPT_TIME)
+    if(interrupt_time.asSeconds() < 1/MOVEMENT_SPEED)
         return false;
 
     interrupt_time = sf::Time::Zero;

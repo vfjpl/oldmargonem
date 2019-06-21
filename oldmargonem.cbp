@@ -32,13 +32,12 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
+			<Add option="-lPocoNet" />
 			<Add library="sfml-network" />
 			<Add library="sfml-graphics" />
 			<Add library="sfml-window" />
 			<Add library="sfml-system" />
 		</Linker>
-		<Unit filename="Http.cpp" />
-		<Unit filename="Http.hpp" />
 		<Unit filename="config.hpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />
