@@ -7,6 +7,5 @@ bool MyKeyboard::anyKey() const
 
 sf::Vector2i MyKeyboard::getPosChange() const
 {
-    return sf::Vector2i(right - left,
-                        down - up);
+    return sf::Vector2i(right - left, down - up);
 }

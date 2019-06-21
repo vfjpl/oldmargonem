@@ -30,6 +30,15 @@ void Map::set_screen_size(sf::Vector2u value)
     screen_center = value/2u;
 }
 
+void Map::set_texture(const sf::Texture& texture)
+{
+    map_sprite.setTexture(texture);
+    sf::Vector2u texture_size = texture.getSize();
+    p_per_tile = (texture_size.x + texture_size.y);
+    p_per_tile /= (map_size.x + map_size.y);
+    p_correction = p_per_tile/2;
+}
+
 void Map::center_to(sf::Vector2i value)
 {
     center_pos_diff = value - center_pos;
@@ -42,18 +51,6 @@ void Map::center_rel(sf::Vector2i value)
     center_old_pos = center_pos;
     center_pos += value;
     center_pos_diff = center_pos - center_old_pos;
-}
-
-void Map::set_texture(const sf::Texture& texture)
-{
-    map_sprite.setTexture(texture);
-    sf::Vector2u texture_size = texture.getSize();
-    p_per_tile = (texture_size.x + texture_size.y);
-    p_per_tile /= (map_size.x + map_size.y);
-    p_correction = p_per_tile/2;
-
-    //position should be now set
-    center_view();
 }
 
 void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)

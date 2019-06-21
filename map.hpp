@@ -30,11 +30,11 @@ public:
     void set_map_size(sf::Vector2u value);
 
     void set_screen_size(sf::Vector2u value);
+    void set_texture(const sf::Texture& texture);
     //move maps view to given position
     void center_to(sf::Vector2i value);
     //move maps view by value relative to current position
     void center_rel(sf::Vector2i value);
-    void set_texture(const sf::Texture& texture);
 
     void draw(sf::RenderWindow& window, sf::Time move_fraction);
 

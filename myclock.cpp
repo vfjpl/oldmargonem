@@ -6,23 +6,23 @@ sf::Time MyClock::getElapsedTime() const
     return clock.getElapsedTime();
 }
 
-sf::Time MyClock::getInterruptTime() const
+sf::Time MyClock::getMoveTime() const
 {
-    return interrupt_time;
+    return move_time;
 }
 
 void MyClock::update()
 {
     sf::Time now = clock.getElapsedTime();
-    interrupt_time += now - last_clock;
+    move_time += now - last_clock;
     last_clock = now;
 }
 
 bool MyClock::interrupt()
 {
-    if(interrupt_time.asSeconds() < 1/MOVEMENT_SPEED)
+    if(move_time.asSeconds() < 1/MOVEMENT_SPEED)
         return false;
 
-    interrupt_time = sf::Time::Zero;
+    move_time = sf::Time::Zero;
     return true;
 }
