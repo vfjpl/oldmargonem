@@ -38,6 +38,8 @@ std::string toString(std::istream& stream)
 Network::Network()
 {
     session.setHost(GAME_ADDRES);
+    session.setKeepAlive(true);
+    request.setVersion(Poco::Net::HTTPRequest::HTTP_1_1);
 }
 
 void Network::set_ev(const std::string& value)

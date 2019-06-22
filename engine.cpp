@@ -18,33 +18,6 @@ constexpr int char2int(const char* str)
         res += str[i];
     return res;
 }
-std::vector<std::string> split(const std::string& parm)
-{
-    std::vector<std::string> temp;
-    for(size_t old_pos = 0;;)
-    {
-        size_t new_pos = parm.find(';', old_pos);
-        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
-        if(new_pos == std::string::npos)
-            break;
-        old_pos = new_pos + 1;
-    }
-    return temp;
-}
-std::vector<std::string> splitv(const std::string& parm)
-{
-    std::vector<std::string> temp;
-    for(size_t old_pos = 0;;)
-    {
-        size_t new_pos = parm.find(';', old_pos);
-        std::string key = parm.substr(old_pos, new_pos - old_pos);
-        temp.push_back(key.substr(key.find('=') + 1));
-        if(new_pos == std::string::npos)
-            break;
-        old_pos = new_pos + 1;
-    }
-    return temp;
-}
 }
 
 Engine::Engine()
@@ -67,9 +40,6 @@ void Engine::networkThreadFunc()
 
 bool Engine::run_game()
 {
-    //temp
-    process_network();
-
     process_input();
     game_logic();
     draw_frame();
@@ -98,7 +68,7 @@ void Engine::setup_window(bool fullscreen)
         mode.height = (mode.height*2)/3;
         window.create(mode, "oldmargonem", sf::Style::Close);
     }
-    window.setFramerateLimit(30);
+    //window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
 }
 
@@ -182,78 +152,57 @@ void Engine::process_network()
 {
     std::string body = network.sendRequest();
     bool alldata = false;
+
     for(size_t old_pos = 0;;)
     {
         size_t new_pos = body.find("<eol>\n<eol>", old_pos);
-        std::string line = body.substr(old_pos, new_pos - old_pos);
-        size_t colon = line.find(':');
-        std::string cmd = line.substr(0, colon);
+        size_t colon_pos = body.find(':', old_pos);
+
+        std::string cmd = body.substr(old_pos, colon_pos++ - old_pos);
 
         switch(str2int(cmd))
         {
         case char2int("hero"):
         {
-            std::vector<std::string> val = splitv(line.substr(colon+1));
-            map.center_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
-            hero.move_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
-            network.set_pdir(val[2]);//direction the player is facing
-            resource_manager.set_mpath(val[11]);
-            resource_manager.load_graphic(val[10], Graphic::CHARACTER);
-            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
+            break;
+        }
+        case char2int("xy"):
+        {
             break;
         }
         case char2int("town"):
         {
-            //FINISHED
-            std::vector<std::string> val = split(line.substr(colon+1));
-            map.set_map_size(sf::Vector2u(std::stoul(val[0]), std::stoul(val[1])));
-            resource_manager.load_graphic(val[2], Graphic::MAP);
-            map.set_texture(resource_manager.get_texture(val[2]));
-            map.set_map_name(val[3]);
-            map.set_map_pvp(val[4]);
-            //val[5] is battle background(load elsewhere)
-            map.set_map_id(val[6]);
-            break;
-        }
-        case char2int("lastevent"):
-        {
-            //FINISHED
-            network.set_ev(line.substr(colon+1));
-            break;
-        }
-        case char2int("maxchat"):
-        {
-            //FINISHED
-            network.set_lastch(line.substr(colon+1));
-            break;
-        }
-        case char2int("maxcchat"):
-        {
-            //FINISHED
-            network.set_lastcch(line.substr(colon+1));
             break;
         }
         case char2int("battlemsg"):
         {
-            std::vector<std::string> val = split(line.substr(colon+1));
-            network.set_bseq(val[0]);
-            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
             break;
         }
-        case char2int("sqltime"):
+        case char2int("lastevent")://FINISHED
         {
-            //FINISHED
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            network.set_ev(parm);
             break;
         }
-        case char2int("end"):
+        case char2int("maxchat")://FINISHED
         {
-            //FINISHED
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            network.set_lastch(parm);
+            break;
+        }
+        case char2int("maxcchat")://FINISHED
+        {
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            network.set_lastcch(parm);
+            break;
+        }
+        case char2int("sqltime")://FINISHED
+        {
+            break;
+        }
+        case char2int("end")://FINISHED
+        {
             alldata = true;
-            break;
-        }
-        case char2int(""):
-        {
-            //FINISHED
             break;
         }
         default:
@@ -270,7 +219,5 @@ void Engine::process_network()
     }// end for
 
     if(!alldata)
-    {
         std::cout << "INVALID PACKET\n";
-    }
 }
