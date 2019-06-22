@@ -23,12 +23,23 @@ Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-    network.login("", "");
+    network.login("login", "sha1password");
+    network.queueLoadSequence();
+}
+
+void Engine::gameThreadFunc()
+{
+    while(run_game());
+}
+
+void Engine::networkThreadFunc()
+{
+    while(run_network());
 }
 
 bool Engine::run_game()
 {
-    input_handle();
+    process_input();
     game_logic();
     draw_frame();
     window.display();
@@ -38,7 +49,7 @@ bool Engine::run_game()
 
 bool Engine::run_network()
 {
-    network_handle();
+    process_network();
 
     return window.isOpen();
 }
@@ -58,115 +69,9 @@ void Engine::setup_window(bool fullscreen)
     }
     window.setFramerateLimit(30);
     window.setKeyRepeatEnabled(false);
-    window.clear();
 }
 
-void Engine::load_game()
-{
-    network.queue_load_sequence();
-    network_handle();
-    network_handle();
-    network_handle();
-    network_handle();
-}
-
-void Engine::network_handle()
-{
-    bool alldata = false;
-    for(size_t old_pos = 0;;)
-    {
-        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
-        std::string line = body.substr(old_pos, new_pos - old_pos);
-        size_t colon = line.find(':');
-        std::string cmd = line.substr(0, colon);
-
-        switch(str2int(cmd))
-        {
-        case char2int("hero"):
-        {
-            std::vector<std::string> val = splitv(line.substr(colon+1));
-            map.center_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
-            hero.move_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
-            network.set_pdir(val[2]);//direction the player is facing
-            resource_manager.set_mpath(val[11]);
-            resource_manager.load_graphic(val[10], Graphic::CHARACTER);
-            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
-            break;
-        }
-        case char2int("town"):
-        {
-            //FINISHED
-            std::vector<std::string> val = split(line.substr(colon+1));
-            map.set_map_size(sf::Vector2u(std::stoul(val[0]), std::stoul(val[1])));
-            resource_manager.load_graphic(val[2], Graphic::MAP);
-            map.set_texture(resource_manager.get_texture(val[2]));
-            map.set_map_name(val[3]);
-            map.set_map_pvp(val[4]);
-            //val[5] is battle background(load elsewhere)
-            map.set_map_id(val[6]);
-            break;
-        }
-        case char2int("lastevent"):
-        {
-            //FINISHED
-            network.set_ev(line.substr(colon+1));
-            break;
-        }
-        case char2int("maxchat"):
-        {
-            //FINISHED
-            network.set_lastch(line.substr(colon+1));
-            break;
-        }
-        case char2int("maxcchat"):
-        {
-            //FINISHED
-            network.set_lastcch(line.substr(colon+1));
-            break;
-        }
-        case char2int("battlemsg"):
-        {
-            std::vector<std::string> val = split(line.substr(colon+1));
-            network.set_bseq(val[0]);
-            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
-            break;
-        }
-        case char2int("sqltime"):
-        {
-            //FINISHED
-            break;
-        }
-        case char2int("end"):
-        {
-            //FINISHED
-            alldata = true;
-            break;
-        }
-        case char2int(""):
-        {
-            //FINISHED
-            break;
-        }
-        default:
-        {
-            std::cout << cmd << " NOT IMPLEMENTED\n";
-            break;
-        }
-        }// end switch
-
-        if(new_pos == std::string::npos)
-            break;
-
-        old_pos = new_pos + 11;
-    }// end for
-
-    if(!alldata)
-    {
-        std::cout << "INVALID PACKET\n";
-    }
-}
-
-void Engine::input_handle()
+void Engine::process_input()
 {
     sf::Event event;
     while(window.pollEvent(event))
@@ -223,11 +128,6 @@ void Engine::input_handle()
             window.close();
             break;
         }
-        case sf::Event::Resized:
-        {
-            window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
-            break;
-        }
         default:
         {
             break;
@@ -238,18 +138,19 @@ void Engine::input_handle()
 
 void Engine::game_logic()
 {
-    if(keyboard.anyKey())
-        if(clock.move_interrupt())
-        {
-            sf::Vector2i temp = keyboard.getPosChange();
-            map.center_rel(temp);
-            hero.move_rel(temp);
-            network.queue_move(hero.get_position());
-        }
+    if(keyboard.anyKey() && clock.moveInterrupt())
+    {
+        map.center_rel(keyboard.getPosChange());
+    }
     clock.update();
 }
 
-void Engine::draw_window()
+void Engine::draw_frame()
 {
     map.draw(window, clock.getMoveTime());
+}
+
+void Engine::process_network()
+{
+
 }

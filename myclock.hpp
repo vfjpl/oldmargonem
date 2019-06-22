@@ -16,7 +16,7 @@ public:
     //updates interrupt times
     void update();
     //true only when certain amount of time have passed
-    bool move_interrupt();
+    bool moveInterrupt();
 };
 
 #endif // MYCLOCK_HPP_INCLUDED
