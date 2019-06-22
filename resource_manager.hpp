@@ -16,7 +16,7 @@ class Resource_Manager
 {
     std::map<std::string, sf::Texture> storage;
     std::string mpath;
-    long size_in_bytes = 0;
+    unsigned long size_in_bytes = 0;
 
 public:
     //sets server address for downloading graphics

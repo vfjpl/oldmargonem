@@ -1,6 +1,6 @@
 #include "map.hpp"
-#include <SFML/Graphics/Texture.hpp>
 #include "config.hpp"
+#include <SFML/Graphics/Texture.hpp>
 
 void Map::set_map_id(const std::string& value)
 {

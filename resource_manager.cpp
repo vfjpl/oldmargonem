@@ -38,9 +38,8 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
     sf::Http::Response resp = http.sendRequest(req);
 
 
-    long lenght = std::stol(resp.getField("Content-Length"));
+    unsigned long lenght = std::stoul(resp.getField("Content-Length"));
     size_in_bytes += lenght;
-    //std::cout << size_in_bytes/1024 << " KiB\n";
 
     if(!storage[name].loadFromMemory(resp.getBody().data(), lenght))
     {
@@ -60,8 +59,6 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
 
         resized.create(orginal_size.x / scale, orginal_size.y / scale);
         sf::Vector2u resized_size = resized.getSize();
-
-        //std::cout << "Resizing by: " << 1/scale << ", New Size: " << resized_size.x << 'x' << resized_size.y << '\n';
 
         for(unsigned int y = 0; y < resized_size.y; ++y)
         {

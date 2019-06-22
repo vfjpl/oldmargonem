@@ -1,6 +1,5 @@
 #include "engine.hpp"
 #include <SFML/Window/Event.hpp>
-#include <iostream>
 
 namespace
 {
@@ -18,33 +17,6 @@ constexpr int char2int(const char* str)
         res += str[i];
     return res;
 }
-std::vector<std::string> split(const std::string& parm)
-{
-    std::vector<std::string> temp;
-    for(size_t old_pos = 0;;)
-    {
-        size_t new_pos = parm.find(';', old_pos);
-        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
-        if(new_pos == std::string::npos)
-            break;
-        old_pos = new_pos + 1;
-    }
-    return temp;
-}
-std::vector<std::string> splitv(const std::string& parm)
-{
-    std::vector<std::string> temp;
-    for(size_t old_pos = 0;;)
-    {
-        size_t new_pos = parm.find(';', old_pos);
-        std::string key = parm.substr(old_pos, new_pos - old_pos);
-        temp.push_back(key.substr(key.find('=') + 1));
-        if(new_pos == std::string::npos)
-            break;
-        old_pos = new_pos + 1;
-    }
-    return temp;
-}
 }
 
 Engine::Engine()
@@ -52,16 +24,21 @@ Engine::Engine()
     setup_window(false);
     map.set_screen_size(window.getSize());
     network.login("", "");
-    load_game();
 }
 
-bool Engine::run()
+bool Engine::run_game()
 {
-    network_handle();
     input_handle();
     game_logic();
-    draw_window();
+    draw_frame();
     window.display();
+
+    return window.isOpen();
+}
+
+bool Engine::run_network()
+{
+    network_handle();
 
     return window.isOpen();
 }
@@ -82,7 +59,6 @@ void Engine::setup_window(bool fullscreen)
     window.setFramerateLimit(30);
     window.setKeyRepeatEnabled(false);
     window.clear();
-    window.display();
 }
 
 void Engine::load_game()

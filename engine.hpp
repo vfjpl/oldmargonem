@@ -21,17 +21,16 @@ class Engine
 
 public:
     Engine();
-    bool run();
+    bool run_game();
+    bool run_network();
 
 private:
     void setup_window(bool fullscreen);
-    void load_game();
 
 
-    void network_handle();
     void input_handle();
     void game_logic();
-    void draw_window();
+    void draw_frame();
 };
 
 #endif // ENGINE_HPP_INCLUDED

@@ -6,8 +6,8 @@
 
 class Map
 {
-    std::string map_name;
     std::string map_id;
+    std::string map_name;
     std::string map_pvp;
     sf::Sprite map_sprite;
     sf::IntRect map_rect;

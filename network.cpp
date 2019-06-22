@@ -11,7 +11,7 @@ namespace
 {
 std::string sha1(const std::string& password)
 {
-    //TODO SHA1
+    //TODO: SHA1
     return password;
 }
 std::string get_pid_value(const std::string& body)
@@ -23,7 +23,8 @@ std::string get_time_string()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    unsigned long rev = (tv.tv_sec*10000);
+    //9 digits
+    unsigned long rev = (tv.tv_sec*10000) + (tv.tv_usec/100);
     return std::to_string(rev).substr(5);
 }
 }
@@ -92,7 +93,7 @@ void Network::login(const std::string& login, const std::string& password)
     request.setCookies(cookies);
 }
 
-void Network::queue_move(sf::Vector2i value)
+void Network::queueMove(sf::Vector2i value)
 {
     if(ml.empty())
         ml = std::to_string(value.x) + ',' + std::to_string(value.y);
@@ -100,12 +101,12 @@ void Network::queue_move(sf::Vector2i value)
         ml += ';' + std::to_string(value.x) + ',' + std::to_string(value.y);
 }
 
-void Network::queue_command(const std::string& command)
+void Network::queueCommand(const std::string& command)
 {
     fifo.push(command);
 }
 
-void Network::queue_load_sequence()
+void Network::queueLoadSequence()
 {
     fifo.emplace("initlvl=1&build=1007&task=init");
     fifo.emplace("initlvl=2&task=init");
@@ -113,9 +114,9 @@ void Network::queue_load_sequence()
     fifo.emplace("initlvl=4&task=init");
 }
 
-std::istream& Network::send_command()
+std::istream& Network::sendRequest()
 {
-    //TODO BATTLE
+    //TODO: BATTLE
     std::string cmd;
     if(!fifo.empty())
     {
