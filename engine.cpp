@@ -18,13 +18,40 @@ constexpr int char2int(const char* str)
         res += str[i];
     return res;
 }
+std::vector<std::string> split(const std::string& parm, char delim)
+{
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = parm.find(delim, old_pos);
+        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
+std::vector<std::string> split2(const std::string& parm, char first, char second)
+{
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        old_pos = parm.find(first, old_pos);
+        size_t new_pos = parm.find(second, old_pos);
+        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
 }
 
 Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-    network.login();
+    network.login("", "");
     network.queueLoadSequence();
 }
 
@@ -138,7 +165,9 @@ void Engine::game_logic()
 {
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
-        map.center_rel(keyboard.getPosChange());
+        hero.move(keyboard.getPosChange());
+        map.center_to(hero.getPosition());
+        network.queueMove(hero.getPosition());
     }
     clock.update();
 }
@@ -164,18 +193,55 @@ void Engine::process_network()
         {
         case char2int("hero"):
         {
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::vector<std::string> p = split2(parm, '=', ';');
+            //p[0-1] is hero pos
+            //p[2] is hero direction
+            hero.set_dir(p[2]);
+            network.set_pdir(p[2]);
+            //p[3] is hero nick
+            //p[4] is
+            //p[5] is hero level
+            //p[6] is hero exp
+            //p[7] is
+            //p[8] is hero gold
+            //p[9] is
+            //p[10]=graphic p[11]=mpath
+            resource_manager.set_mpath(p[11]);
+            resource_manager.load_graphic(p[10], Graphic::CHARACTER);
+            hero.set_texture(resource_manager.get_texture(p[10]));
+            //p[12] is
+            //p[13] is
+            //p[14] is
+            //p[15] is hero profession shortcut
+            //p[16] is hero base strenght
+            //p[17] is hero base agility
+            //p[18] is hero base inteligence
+            //p[19] is hero profession name
             break;
         }
-        case char2int("xy"):
+        case char2int("xy")://FINISHED
         {
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::vector<std::string> p = split(parm, ',');
+            //p[0-1] is hero pos
+            hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
+            //p[2] is map id
             break;
         }
         case char2int("town"):
         {
-            break;
-        }
-        case char2int("battlemsg"):
-        {
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::vector<std::string> p = split(parm, ';');
+            //p[0-1] is map size
+            map.set_map_size(sf::Vector2u(std::stoul(p[0]), std::stoul(p[1])));
+            //p[2] is map graphic
+            resource_manager.load_graphic(p[2], Graphic::MAP);
+            map.set_texture(resource_manager.get_texture(p[2]));
+            //p[3] is map name
+            //p[4] is
+            //p[5] is battle background
+            //p[6] is map id
             break;
         }
         case char2int("lastevent")://FINISHED
@@ -211,10 +277,8 @@ void Engine::process_network()
             break;
         }
         }// end switch
-
         if(new_pos == std::string::npos)
             break;
-
         old_pos = new_pos + 11;
     }// end for
 

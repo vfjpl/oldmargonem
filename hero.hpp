@@ -6,18 +6,20 @@
 
 class Hero
 {
+    sf::Sprite hero_sprite;
     std::string hero_nick;
     std::string hero_dir;
-    sf::Sprite hero_sprite;
     sf::Vector2i hero_pos;
 
 public:
-    void set_hero_nick(const std::string& value);
+    void set_nick(const std::string& value);
+    void set_dir(const std::string& value);
     void set_texture(const sf::Texture& texture);
-    void move_to(sf::Vector2i value);
-    void move_rel(sf::Vector2i value);
+    void set_pos(sf::Vector2i value);
+    void move(sf::Vector2i value);
 
-    sf::Vector2i get_position() const;
+    sf::Vector2i getPosition() const;
+
 };
 
 #endif // HERO_HPP_INCLUDED
