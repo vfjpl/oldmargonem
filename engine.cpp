@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include <SFML/Window/Event.hpp>
+#include <iostream>
 
 namespace
 {
@@ -17,13 +18,40 @@ constexpr int char2int(const char* str)
         res += str[i];
     return res;
 }
+std::vector<std::string> split(const std::string& parm)
+{
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = parm.find(';', old_pos);
+        temp.push_back(parm.substr(old_pos, new_pos - old_pos));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
+std::vector<std::string> splitv(const std::string& parm)
+{
+    std::vector<std::string> temp;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = parm.find(';', old_pos);
+        std::string key = parm.substr(old_pos, new_pos - old_pos);
+        temp.push_back(key.substr(key.find('=') + 1));
+        if(new_pos == std::string::npos)
+            break;
+        old_pos = new_pos + 1;
+    }
+    return temp;
+}
 }
 
 Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-    network.login("login", "sha1password");
+    network.login();
     network.queueLoadSequence();
 }
 
@@ -39,6 +67,9 @@ void Engine::networkThreadFunc()
 
 bool Engine::run_game()
 {
+    //temp
+    process_network();
+
     process_input();
     game_logic();
     draw_frame();
@@ -93,9 +124,6 @@ void Engine::process_input()
                 break;
             case sf::Keyboard::D:
                 keyboard.right = true;
-                break;
-            case sf::Keyboard::Escape:
-                window.close();
                 break;
             default:
                 break;
@@ -152,5 +180,97 @@ void Engine::draw_frame()
 
 void Engine::process_network()
 {
+    std::string body = network.sendRequest();
+    bool alldata = false;
+    for(size_t old_pos = 0;;)
+    {
+        size_t new_pos = body.find("<eol>\n<eol>", old_pos);
+        std::string line = body.substr(old_pos, new_pos - old_pos);
+        size_t colon = line.find(':');
+        std::string cmd = line.substr(0, colon);
 
+        switch(str2int(cmd))
+        {
+        case char2int("hero"):
+        {
+            std::vector<std::string> val = splitv(line.substr(colon+1));
+            map.center_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
+            hero.move_to(sf::Vector2i(std::stoi(val[0]), std::stoi(val[1])));
+            network.set_pdir(val[2]);//direction the player is facing
+            resource_manager.set_mpath(val[11]);
+            resource_manager.load_graphic(val[10], Graphic::CHARACTER);
+            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
+            break;
+        }
+        case char2int("town"):
+        {
+            //FINISHED
+            std::vector<std::string> val = split(line.substr(colon+1));
+            map.set_map_size(sf::Vector2u(std::stoul(val[0]), std::stoul(val[1])));
+            resource_manager.load_graphic(val[2], Graphic::MAP);
+            map.set_texture(resource_manager.get_texture(val[2]));
+            map.set_map_name(val[3]);
+            map.set_map_pvp(val[4]);
+            //val[5] is battle background(load elsewhere)
+            map.set_map_id(val[6]);
+            break;
+        }
+        case char2int("lastevent"):
+        {
+            //FINISHED
+            network.set_ev(line.substr(colon+1));
+            break;
+        }
+        case char2int("maxchat"):
+        {
+            //FINISHED
+            network.set_lastch(line.substr(colon+1));
+            break;
+        }
+        case char2int("maxcchat"):
+        {
+            //FINISHED
+            network.set_lastcch(line.substr(colon+1));
+            break;
+        }
+        case char2int("battlemsg"):
+        {
+            std::vector<std::string> val = split(line.substr(colon+1));
+            network.set_bseq(val[0]);
+            std::cout << cmd << " PARTIALLY IMPLEMENTED\n";
+            break;
+        }
+        case char2int("sqltime"):
+        {
+            //FINISHED
+            break;
+        }
+        case char2int("end"):
+        {
+            //FINISHED
+            alldata = true;
+            break;
+        }
+        case char2int(""):
+        {
+            //FINISHED
+            break;
+        }
+        default:
+        {
+            std::cout << cmd << " NOT IMPLEMENTED\n";
+            break;
+        }
+        }// end switch
+
+        if(new_pos == std::string::npos)
+            break;
+
+        old_pos = new_pos + 11;
+    }// end for
+
+    if(!alldata)
+    {
+        std::cout << "INVALID PACKET\n";
+    }
 }

@@ -35,7 +35,7 @@ public:
     void queueCommand(const std::string& command);
     void queueLoadSequence();
 
-    std::istream& sendRequest();
+    std::string sendRequest();
 };
 
 #endif // NETWORK_HPP_INCLUDED
