@@ -36,7 +36,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
     std::vector<std::string> temp;
     for(size_t old_pos = 0;;)
     {
-        old_pos = parm.find(first, old_pos);
+        old_pos = parm.find(first, old_pos) + 1;
         size_t new_pos = parm.find(second, old_pos);
         temp.push_back(parm.substr(old_pos, new_pos - old_pos));
         if(new_pos == std::string::npos)
@@ -51,7 +51,7 @@ Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
-    network.login("", "");
+    network.login();
     network.queueLoadSequence();
 }
 
@@ -196,6 +196,7 @@ void Engine::process_network()
             std::string parm = body.substr(colon_pos, new_pos - colon_pos);
             std::vector<std::string> p = split2(parm, '=', ';');
             //p[0-1] is hero pos
+            hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
             //p[2] is hero direction
             hero.set_dir(p[2]);
             network.set_pdir(p[2]);
@@ -220,15 +221,6 @@ void Engine::process_network()
             //p[19] is hero profession name
             break;
         }
-        case char2int("xy")://FINISHED
-        {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
-            std::vector<std::string> p = split(parm, ',');
-            //p[0-1] is hero pos
-            hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
-            //p[2] is map id
-            break;
-        }
         case char2int("town"):
         {
             std::string parm = body.substr(colon_pos, new_pos - colon_pos);
@@ -244,10 +236,13 @@ void Engine::process_network()
             //p[6] is map id
             break;
         }
-        case char2int("lastevent")://FINISHED
+        case char2int("move")://FINISHED
         {
             std::string parm = body.substr(colon_pos, new_pos - colon_pos);
-            network.set_ev(parm);
+            std::vector<std::string> p = split(parm, ',');
+            //p[0-1] is hero pos
+            hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
+            //p[2] is
             break;
         }
         case char2int("maxchat")://FINISHED
@@ -260,6 +255,16 @@ void Engine::process_network()
         {
             std::string parm = body.substr(colon_pos, new_pos - colon_pos);
             network.set_lastcch(parm);
+            break;
+        }
+        case char2int("lastevent")://FINISHED
+        {
+            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            network.set_ev(parm);
+            break;
+        }
+        case char2int("xy")://FINISHED
+        {
             break;
         }
         case char2int("sqltime")://FINISHED
