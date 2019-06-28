@@ -30,6 +30,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++1z" />
 		</Compiler>
 		<Linker>
 			<Add option="-lPocoNet" />

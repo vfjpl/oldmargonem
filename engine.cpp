@@ -111,15 +111,19 @@ void Engine::process_input()
             switch(event.key.code)
             {
             case sf::Keyboard::W:
+                keyboard.dir = '3';
                 keyboard.up = true;
                 break;
             case sf::Keyboard::A:
+                keyboard.dir = '1';
                 keyboard.left = true;
                 break;
             case sf::Keyboard::S:
+                keyboard.dir = '0';
                 keyboard.down = true;
                 break;
             case sf::Keyboard::D:
+                keyboard.dir = '2';
                 keyboard.right = true;
                 break;
             default:
