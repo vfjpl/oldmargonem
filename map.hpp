@@ -7,10 +7,10 @@
 class Map
 {
     sf::Sprite map_sprite;
+    sf::IntRect sprite_rect;
     std::string map_id;
     std::string map_name;
     std::string map_pvp;
-    sf::IntRect map_rect;
     sf::Vector2u map_size;
 
     sf::Vector2u screen_center;

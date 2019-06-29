@@ -24,8 +24,8 @@ void Map::set_map_size(sf::Vector2u value)
 
 void Map::set_screen_size(sf::Vector2u value)
 {
-    map_rect.width = value.x;
-    map_rect.height = value.y;
+    sprite_rect.width = value.x;
+    sprite_rect.height = value.y;
     screen_center = value/2u;
 }
 
@@ -63,16 +63,16 @@ void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)
 
 void Map::center_view()
 {
-    map_rect.left = (center_pos.x * p_per_tile) + (p_correction) - (screen_center.x);
-    map_rect.top = (center_pos.y * p_per_tile) + (p_correction) - (screen_center.y);
-    map_sprite.setTextureRect(map_rect);
+    sprite_rect.left = (center_pos.x * p_per_tile) + (p_correction) - (screen_center.x);
+    sprite_rect.top = (center_pos.y * p_per_tile) + (p_correction) - (screen_center.y);
+    map_sprite.setTextureRect(sprite_rect);
 }
 
 void Map::center_view_smooth(sf::Time move_fraction)
 {
-    map_rect.left = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
+    sprite_rect.left = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
                     + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
-    map_rect.top = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
+    sprite_rect.top = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
                    + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
-    map_sprite.setTextureRect(map_rect);
+    map_sprite.setTextureRect(sprite_rect);
 }

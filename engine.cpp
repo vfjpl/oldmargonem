@@ -50,8 +50,9 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 Engine::Engine()
 {
     setup_window(false);
-    map.set_screen_size(window.getSize());
-    hero.set_screen_size(window.getSize());
+    sf::Vector2u screen_size(window.getSize());
+    map.set_screen_size(screen_size);
+    hero.set_screen_size(screen_size);
     network.login();
     network.queueLoadSequence();
 }
@@ -98,6 +99,7 @@ void Engine::setup_window(bool fullscreen)
     }
     //window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
+    window.clear();
 }
 
 void Engine::process_input()
@@ -174,7 +176,7 @@ void Engine::game_logic()
         hero.move(keyboard.getPosChange());
 
         //sync
-        network.set_pdir(hero.getDir());
+        network.set_pdir(keyboard.dir);
         network.queueMove(hero.getPosition());
         map.center_to(hero.getPosition());
     }
@@ -232,7 +234,7 @@ void Engine::process_network()
             resource_manager.load_graphic(p[10], Graphic::CHARACTER);
             hero.set_texture(resource_manager.get_texture(p[10]));
             hero.set_dir(p[2]);
-            network.set_pdir(hero.getDir());
+            network.set_pdir(p[2]);
             break;
         }
         case char2int("town"):

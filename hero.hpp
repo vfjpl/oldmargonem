@@ -7,9 +7,11 @@
 class Hero
 {
     sf::Sprite hero_sprite;
+    sf::IntRect sprite_rect;
     std::string hero_nick;
     std::string hero_dir;
-    sf::IntRect sprite_rect;
+
+    sf::Vector2u screen_center;
 
     sf::Vector2i hero_pos;
 
@@ -24,7 +26,6 @@ public:
     void move(sf::Vector2i value);
 
     sf::Vector2i getPosition() const;
-    std::string getDir() const;
 
     void draw(sf::RenderWindow& window);
 };
