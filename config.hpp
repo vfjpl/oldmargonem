@@ -3,6 +3,6 @@
 
 #define LOGIN_ADDRES "www.oldmargonem.pl"
 #define GAME_ADDRES "game.oldmargonem.pl"
-#define MOVEMENT_SPEED 5.0f
+#define MOVEMENT_SPEED 6.0f
 
 #endif // CONFIG_HPP_INCLUDED

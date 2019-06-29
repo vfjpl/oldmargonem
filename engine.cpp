@@ -50,7 +50,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 Engine::Engine()
 {
     setup_window(false);
-    sf::Vector2u screen_size(window.getSize());
+    sf::Vector2u screen_size = window.getSize();
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
     network.login();
@@ -97,9 +97,8 @@ void Engine::setup_window(bool fullscreen)
         mode.height = (mode.height*2)/3;
         window.create(mode, "oldmargonem", sf::Style::Close);
     }
-    //window.setVerticalSyncEnabled(true);
+    window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
-    window.clear();
 }
 
 void Engine::process_input()
@@ -173,12 +172,12 @@ void Engine::game_logic()
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
         hero.set_dir(keyboard.dir);
-        hero.move(keyboard.getPosChange());
-
-        //sync
         network.set_pdir(keyboard.dir);
+
+        sf::Vector2i pos_dif = keyboard.getPosChange();
+        hero.move(pos_dif);
+        map.center_rel(pos_dif);
         network.queueMove(hero.getPosition());
-        map.center_to(hero.getPosition());
     }
     clock.update();
 }
@@ -203,15 +202,33 @@ void Engine::process_network()
 
         switch(str2int(cmd))
         {
+        case char2int("element"):
+        {
+            std::string parm = line.substr(colon + 1);
+            std::vector<std::string> p = split2(parm, '=', ';');
+
+            //p[0] element type
+            switch(str2int(p[0]))
+            {
+            default:
+            {
+                std::cout << p[0] << " NOT IMPLEMENTED\n";
+                break;
+            }
+            }//end switch
+            break;
+        }
         case char2int("hero"):
         {
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split2(parm, '=', ';');
 
             //p[0-1] is hero pos
-            hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
-            map.center_to(hero.getPosition());
+            sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
+            hero.set_pos(pos);
+            map.center_to(pos);
             //p[2] is hero direction
+
             //p[3] is hero nick
             //p[4] is
             //p[5] is hero level
@@ -220,7 +237,9 @@ void Engine::process_network()
             //p[8] is hero gold
             //p[9] is
             //p[10] is hero graphic
+
             //p[11] is mpath
+
             //p[12] is
             //p[13] is
             //p[14] is
@@ -237,7 +256,7 @@ void Engine::process_network()
             network.set_pdir(p[2]);
             break;
         }
-        case char2int("town"):
+        case char2int("town")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split(parm, ';');
@@ -248,20 +267,26 @@ void Engine::process_network()
             resource_manager.load_graphic(p[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(p[2]));
             //p[3] is map name
-            //p[4] is
+            map.set_map_name(p[3]);
+            //p[4] is map pvp
+            map.set_map_pvp(p[4]);
             //p[5] is battle background
             //p[6] is map id
+            map.set_map_id(p[6]);
             break;
         }
-        case char2int("move"):
+        case char2int("move")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split(parm, ',');
 
             //p[0-1] is hero pos
-            hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
-            map.center_to(hero.getPosition());
-            //p[2] is
+            sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
+            hero.set_pos(pos);
+            map.center_to(pos);
+            //p[2] is hero dir
+            hero.set_dir(p[2]);
+            network.set_pdir(p[2]);
             break;
         }
         case char2int("maxchat")://FINISHED

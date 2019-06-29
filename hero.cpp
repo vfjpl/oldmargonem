@@ -26,9 +26,8 @@ void Hero::set_texture(const sf::Texture& texture)
     sprite_rect.width = texture_size.x/4;
     sprite_rect.height = texture_size.y/4;
 
-    p_per_tile = sf::Vector2f(texture_size)/4.0f;
-
     sf::Vector2f correction(screen_center);
+    p_per_tile = sf::Vector2f(texture_size)/4.0f;
     correction -= p_per_tile/2.0f;
 
     hero_sprite.setPosition(correction);
