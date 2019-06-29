@@ -51,6 +51,7 @@ Engine::Engine()
 {
     setup_window(false);
     map.set_screen_size(window.getSize());
+    hero.set_screen_size(window.getSize());
     network.login();
     network.queueLoadSequence();
 }
@@ -183,6 +184,7 @@ void Engine::game_logic()
 void Engine::draw_frame()
 {
     map.draw(window, clock.getMoveTime());
+    hero.draw(window);
 }
 
 void Engine::process_network()
@@ -208,8 +210,6 @@ void Engine::process_network()
             hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
             map.center_to(hero.getPosition());
             //p[2] is hero direction
-            hero.set_dir(p[2]);
-            network.set_pdir(hero.getDir());
             //p[3] is hero nick
             //p[4] is
             //p[5] is hero level
@@ -217,10 +217,8 @@ void Engine::process_network()
             //p[7] is
             //p[8] is hero gold
             //p[9] is
-            //p[10]=graphic p[11]=mpath
-            resource_manager.set_mpath(p[11]);
-            resource_manager.load_graphic(p[10], Graphic::CHARACTER);
-            hero.set_texture(resource_manager.get_texture(p[10]));
+            //p[10] is hero graphic
+            //p[11] is mpath
             //p[12] is
             //p[13] is
             //p[14] is
@@ -229,6 +227,12 @@ void Engine::process_network()
             //p[17] is hero base agility
             //p[18] is hero base inteligence
             //p[19] is hero profession name
+
+            resource_manager.set_mpath(p[11]);
+            resource_manager.load_graphic(p[10], Graphic::CHARACTER);
+            hero.set_texture(resource_manager.get_texture(p[10]));
+            hero.set_dir(p[2]);
+            network.set_pdir(hero.getDir());
             break;
         }
         case char2int("town"):

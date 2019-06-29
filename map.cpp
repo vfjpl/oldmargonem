@@ -26,7 +26,6 @@ void Map::set_screen_size(sf::Vector2u value)
 {
     map_rect.width = value.x;
     map_rect.height = value.y;
-    screen_size = value;
     screen_center = value/2u;
 }
 

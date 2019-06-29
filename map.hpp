@@ -13,7 +13,6 @@ class Map
     sf::IntRect map_rect;
     sf::Vector2u map_size;
 
-    sf::Vector2u screen_size;
     sf::Vector2u screen_center;
 
     sf::Vector2i center_pos;

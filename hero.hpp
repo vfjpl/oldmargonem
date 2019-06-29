@@ -1,17 +1,22 @@
 #ifndef HERO_HPP_INCLUDED
 #define HERO_HPP_INCLUDED
 
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-#include <string>
 
 class Hero
 {
     sf::Sprite hero_sprite;
     std::string hero_nick;
     std::string hero_dir;
+    sf::IntRect sprite_rect;
+
     sf::Vector2i hero_pos;
 
+    sf::Vector2f p_per_tile;
+
 public:
+    void set_screen_size(sf::Vector2u value);
     void set_nick(const std::string& value);
     void set_dir(const std::string& value);
     void set_texture(const sf::Texture& texture);
@@ -20,6 +25,8 @@ public:
 
     sf::Vector2i getPosition() const;
     std::string getDir() const;
+
+    void draw(sf::RenderWindow& window);
 };
 
 #endif // HERO_HPP_INCLUDED
