@@ -41,9 +41,9 @@ void Map::set_texture(const sf::Texture& texture)
 
 void Map::center_to(sf::Vector2i value)
 {
-    center_pos_diff = value - center_pos;
     center_old_pos = center_pos;
     center_pos = value;
+    center_pos_diff = center_pos - center_old_pos;
 }
 
 void Map::center_rel(sf::Vector2i value)

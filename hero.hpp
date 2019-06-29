@@ -19,7 +19,7 @@ public:
     void move(sf::Vector2i value);
 
     sf::Vector2i getPosition() const;
-
+    std::string getDir() const;
 };
 
 #endif // HERO_HPP_INCLUDED

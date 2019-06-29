@@ -29,3 +29,8 @@ sf::Vector2i Hero::getPosition() const
 {
     return hero_pos;
 }
+
+std::string Hero::getDir() const
+{
+    return hero_dir;
+}

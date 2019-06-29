@@ -169,9 +169,13 @@ void Engine::game_logic()
 {
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
+        hero.set_dir(keyboard.dir);
         hero.move(keyboard.getPosChange());
-        map.center_to(hero.getPosition());
+
+        //sync
+        network.set_pdir(hero.getDir());
         network.queueMove(hero.getPosition());
+        map.center_to(hero.getPosition());
     }
     clock.update();
 }
@@ -189,21 +193,23 @@ void Engine::process_network()
     for(size_t old_pos = 0;;)
     {
         size_t new_pos = body.find("<eol>\n<eol>", old_pos);
-        size_t colon_pos = body.find(':', old_pos);
-
-        std::string cmd = body.substr(old_pos, colon_pos++ - old_pos);
+        std::string line = body.substr(old_pos, new_pos - old_pos);
+        size_t colon = line.find(':');
+        std::string cmd = line.substr(0, colon);
 
         switch(str2int(cmd))
         {
         case char2int("hero"):
         {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split2(parm, '=', ';');
+
             //p[0-1] is hero pos
             hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
+            map.center_to(hero.getPosition());
             //p[2] is hero direction
             hero.set_dir(p[2]);
-            network.set_pdir(p[2]);
+            network.set_pdir(hero.getDir());
             //p[3] is hero nick
             //p[4] is
             //p[5] is hero level
@@ -227,8 +233,9 @@ void Engine::process_network()
         }
         case char2int("town"):
         {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split(parm, ';');
+
             //p[0-1] is map size
             map.set_map_size(sf::Vector2u(std::stoul(p[0]), std::stoul(p[1])));
             //p[2] is map graphic
@@ -240,30 +247,32 @@ void Engine::process_network()
             //p[6] is map id
             break;
         }
-        case char2int("move")://FINISHED
+        case char2int("move"):
         {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split(parm, ',');
+
             //p[0-1] is hero pos
             hero.set_pos(sf::Vector2i(std::stoi(p[0]), std::stoi(p[1])));
+            map.center_to(hero.getPosition());
             //p[2] is
             break;
         }
         case char2int("maxchat")://FINISHED
         {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::string parm = line.substr(colon + 1);
             network.set_lastch(parm);
             break;
         }
         case char2int("maxcchat")://FINISHED
         {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::string parm = line.substr(colon + 1);
             network.set_lastcch(parm);
             break;
         }
         case char2int("lastevent")://FINISHED
         {
-            std::string parm = body.substr(colon_pos, new_pos - colon_pos);
+            std::string parm = line.substr(colon + 1);
             network.set_ev(parm);
             break;
         }

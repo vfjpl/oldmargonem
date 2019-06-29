@@ -2,7 +2,7 @@
 
 bool MyKeyboard::anyKey() const
 {
-    return up || left || down || right;
+    return (left != right) || (up != down);
 }
 
 sf::Vector2i MyKeyboard::getPosChange() const
