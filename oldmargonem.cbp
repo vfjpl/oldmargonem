@@ -34,6 +34,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="-lPocoNet" />
+			<Add option="-lPocoFoundation" />
 			<Add library="sfml-network" />
 			<Add library="sfml-graphics" />
 			<Add library="sfml-window" />

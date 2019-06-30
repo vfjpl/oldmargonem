@@ -1,7 +1,8 @@
 #include "network.hpp"
 #include "config.hpp"
-#include <Poco/Net/NameValueCollection.h>
+#include <Poco/SHA1Engine.h>
 #include <Poco/Net/HTMLForm.h>
+#include <Poco/Net/NameValueCollection.h>
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPCookie.h>
 #include <sys/time.h>
@@ -11,8 +12,9 @@ namespace
 {
 std::string sha1(const std::string& password)
 {
-    //TODO: SHA1
-    return password;
+    Poco::SHA1Engine sha1engine;
+    sha1engine.update("mleczko" + password);
+    return sha1engine.digestToHex(sha1engine.digest());
 }
 std::string getPidValue(const std::string& body)
 {

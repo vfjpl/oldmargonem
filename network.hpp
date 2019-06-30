@@ -28,7 +28,7 @@ public:
     void set_bseq(const std::string& value);
     void set_pdir(const std::string& value);
 
-    //logs in and sets necessary cookies(currently you have to give it sha1 hashed password)
+    //logs in and sets necessary cookies
     void login(const std::string& login, const std::string& password);
 
     void queueMove(sf::Vector2i value);
