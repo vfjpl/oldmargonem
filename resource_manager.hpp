@@ -19,7 +19,7 @@ class Resource_Manager
     unsigned long size_in_bytes = 0;
 
 public:
-    //sets server address for downloading graphics
+    //set server address for downloading graphics
     void set_mpath(const std::string& value);
     //give you texture that you can use with sprites
     const sf::Texture& get_texture(const std::string& name) const;

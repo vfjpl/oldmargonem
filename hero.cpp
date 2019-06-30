@@ -25,12 +25,12 @@ void Hero::set_texture(const sf::Texture& texture)
     sf::Vector2u texture_size = texture.getSize();
     sprite_rect.width = texture_size.x/4;
     sprite_rect.height = texture_size.y/4;
+    p_per_tile = sf::Vector2f(texture_size)/4.f;
 
-    sf::Vector2f correction(screen_center);
-    p_per_tile = sf::Vector2f(texture_size)/4.0f;
-    correction -= p_per_tile/2.0f;
+    sf::Vector2f sprite_pos(screen_center);
+    sprite_pos -= p_per_tile/2.f;
 
-    hero_sprite.setPosition(correction);
+    hero_sprite.setPosition(sprite_pos);
 }
 
 void Hero::set_pos(sf::Vector2i value)

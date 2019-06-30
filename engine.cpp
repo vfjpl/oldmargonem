@@ -97,7 +97,7 @@ void Engine::setup_window(bool fullscreen)
         mode.height = (mode.height*2)/3;
         window.create(mode, "oldmargonem", sf::Style::Close);
     }
-    window.setVerticalSyncEnabled(true);
+    //window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
 }
 
@@ -210,11 +210,28 @@ void Engine::process_network()
             //p[0] element type
             switch(str2int(p[0]))
             {
+            case char2int("item"):
+                //p[1] is item id
+                //p[2] is item name
+                //p[3-4] is item position
+                //p[5] is item graphic
+                resource_manager.load_graphic(p[5], Graphic::ITEM);
+                break;
+            case char2int("npc"):
+                //p[1] is npc id
+                //p[2] is npc nick
+                //p[3-4] is npc position
+                //p[5] is npc graphic
+                resource_manager.load_graphic(p[5], Graphic::NPC);
+                //p[6] is npc level
+                //p[7] is
+                //p[8] is
+                //p[9] is npc group fight
+                //p[10] is npc questmark
+                break;
             default:
-            {
                 std::cout << p[0] << " NOT IMPLEMENTED\n";
                 break;
-            }
             }//end switch
             break;
         }

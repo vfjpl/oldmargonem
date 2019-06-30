@@ -71,8 +71,8 @@ void Map::center_view()
 void Map::center_view_smooth(sf::Time move_fraction)
 {
     sprite_rect.left = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
-                    + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
+                       + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
     sprite_rect.top = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
-                   + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
+                      + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
     map_sprite.setTextureRect(sprite_rect);
 }
