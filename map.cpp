@@ -2,21 +2,6 @@
 #include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
-void Map::set_map_id(const std::string& value)
-{
-    map_id = value;
-}
-
-void Map::set_map_name(const std::string& value)
-{
-    map_name = value;
-}
-
-void Map::set_map_pvp(const std::string& value)
-{
-    map_pvp = value;
-}
-
 void Map::set_map_size(sf::Vector2u value)
 {
     map_size = value;
@@ -42,13 +27,6 @@ void Map::center_to(sf::Vector2i value)
 {
     center_old_pos = center_pos;
     center_pos = value;
-    center_pos_diff = center_pos - center_old_pos;
-}
-
-void Map::center_rel(sf::Vector2i value)
-{
-    center_old_pos = center_pos;
-    center_pos += value;
     center_pos_diff = center_pos - center_old_pos;
 }
 

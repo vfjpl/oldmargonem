@@ -163,7 +163,7 @@ void Engine::process_input()
         {
             break;
         }
-        }//end switch
+        }// end switch
     }
 }
 
@@ -171,13 +171,13 @@ void Engine::game_logic()
 {
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
-        hero.set_dir(keyboard.dir);
         network.set_pdir(keyboard.dir);
+        hero.set_dir(keyboard.dir);
+        hero.move(keyboard.getPosChange());
 
-        sf::Vector2i pos_dif = keyboard.getPosChange();
-        hero.move(pos_dif);
-        map.center_rel(pos_dif);
-        network.queueMove(hero.getPosition());
+        sf::Vector2i pos = hero.getPosition();
+        map.center_to(pos);
+        network.queueMove(pos);
     }
     clock.update();
 }
@@ -232,7 +232,7 @@ void Engine::process_network()
             default:
                 std::cout << p[0] << " NOT IMPLEMENTED\n";
                 break;
-            }//end switch
+            }// end switch
             break;
         }
         case char2int("hero"):
@@ -284,12 +284,9 @@ void Engine::process_network()
             resource_manager.load_graphic(p[2], Graphic::MAP);
             map.set_texture(resource_manager.get_texture(p[2]));
             //p[3] is map name
-            map.set_map_name(p[3]);
             //p[4] is map pvp
-            map.set_map_pvp(p[4]);
             //p[5] is battle background
             //p[6] is map id
-            map.set_map_id(p[6]);
             break;
         }
         case char2int("move")://FINISHED

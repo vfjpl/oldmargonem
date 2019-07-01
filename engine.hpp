@@ -1,7 +1,6 @@
 #ifndef ENGINE_HPP_INCLUDED
 #define ENGINE_HPP_INCLUDED
 
-#include <SFML/Graphics/RenderWindow.hpp>
 #include "map.hpp"
 #include "network.hpp"
 #include "hero.hpp"

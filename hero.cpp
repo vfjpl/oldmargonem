@@ -6,16 +6,9 @@ void Hero::set_screen_size(sf::Vector2u value)
     screen_center = value/2u;
 }
 
-void Hero::set_nick(const std::string& value)
-{
-    hero_nick = value;
-}
-
 void Hero::set_dir(const std::string& value)
 {
-    hero_dir = value;
-    sprite_rect.top = std::stoul(hero_dir) * p_per_tile.y;
-
+    sprite_rect.top = std::stoul(value) * p_per_tile.y;
     hero_sprite.setTextureRect(sprite_rect);
 }
 
@@ -29,7 +22,6 @@ void Hero::set_texture(const sf::Texture& texture)
 
     sf::Vector2f sprite_pos(screen_center);
     sprite_pos -= p_per_tile/2.f;
-
     hero_sprite.setPosition(sprite_pos);
 }
 

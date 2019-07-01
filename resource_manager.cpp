@@ -64,7 +64,7 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
         {
             for(unsigned int x = 0; x < resized_size.x; ++x)
             {
-                resized.setPixel(x, y, orginal.getPixel(x*scale, y*scale));
+                resized.setPixel(x, y, orginal.getPixel(x * scale, y * scale));
             }
         }
         storage[name].loadFromImage(resized);
