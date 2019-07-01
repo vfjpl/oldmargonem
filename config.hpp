@@ -3,6 +3,7 @@
 
 #define LOGIN_ADDRES "www.oldmargonem.pl"
 #define GAME_ADDRES "game.oldmargonem.pl"
+#define PASSHASH "mleczko"
 #define MOVEMENT_SPEED 6.f
 
 #endif // CONFIG_HPP_INCLUDED

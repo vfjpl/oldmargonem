@@ -13,7 +13,7 @@ namespace
 std::string sha1(const std::string& password)
 {
     Poco::SHA1Engine sha1engine;
-    sha1engine.update("mleczko" + password);
+    sha1engine.update(PASSHASH + password);
     return sha1engine.digestToHex(sha1engine.digest());
 }
 std::string getPidValue(const std::string& body)

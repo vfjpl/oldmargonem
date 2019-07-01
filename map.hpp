@@ -10,14 +10,13 @@ class Map
     sf::IntRect sprite_rect;
     sf::Vector2u map_size;
 
-    sf::Vector2u screen_center;
+    sf::Vector2f screen_center;
+    float p_per_tile;
+    float p_correction;
 
     sf::Vector2i center_pos;
     sf::Vector2i center_old_pos;
     sf::Vector2i center_pos_diff;
-
-    float p_per_tile;
-    float p_correction;
 
 public:
     void set_map_size(sf::Vector2u value);

@@ -11,7 +11,7 @@ void Map::set_screen_size(sf::Vector2u value)
 {
     sprite_rect.width = value.x;
     sprite_rect.height = value.y;
-    screen_center = value/2u;
+    screen_center = sf::Vector2f(value)/2.f;
 }
 
 void Map::set_texture(const sf::Texture& texture)
