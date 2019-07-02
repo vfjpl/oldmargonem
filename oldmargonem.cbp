@@ -45,6 +45,8 @@
 		<Unit filename="engine.hpp" />
 		<Unit filename="hero.cpp" />
 		<Unit filename="hero.hpp" />
+		<Unit filename="item.cpp" />
+		<Unit filename="item.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="map.cpp" />
 		<Unit filename="map.hpp" />
@@ -54,6 +56,8 @@
 		<Unit filename="mykeyboard.hpp" />
 		<Unit filename="network.cpp" />
 		<Unit filename="network.hpp" />
+		<Unit filename="npc.cpp" />
+		<Unit filename="npc.hpp" />
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
 		<Extensions>

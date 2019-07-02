@@ -1,11 +1,17 @@
 #ifndef MAP_HPP_INCLUDED
 #define MAP_HPP_INCLUDED
 
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+#include "npc.hpp"
+#include "item.hpp"
+#include <deque>
 
 class Map
 {
+public:
+    std::deque<NPC> NPCs;
+    std::deque<Item> items;
+
+private:
     sf::Sprite map_sprite;
     sf::IntRect sprite_rect;
     sf::Vector2u map_size;
@@ -27,10 +33,6 @@ public:
     void center_to(sf::Vector2i value);
 
     void draw(sf::RenderWindow& window, sf::Time move_fraction);
-
-private:
-    void center_view();
-    void center_view_smooth(sf::Time move_fraction);
 };
 
 #endif // MAP_HPP_INCLUDED

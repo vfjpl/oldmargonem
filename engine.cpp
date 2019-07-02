@@ -211,18 +211,24 @@ void Engine::process_network()
             switch(str2int(p[0]))
             {
             case char2int("item"):
+                map.items.emplace_back();
                 //p[1] is item id
                 //p[2] is item name
                 //p[3-4] is item position
+                map.items.back().set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 //p[5] is item graphic
                 resource_manager.load_graphic(p[5], Graphic::ITEM);
+                map.items.back().set_texture(resource_manager.get_texture(p[5]));
                 break;
             case char2int("npc"):
+                map.NPCs.emplace_back();
                 //p[1] is npc id
                 //p[2] is npc nick
                 //p[3-4] is npc position
+                map.NPCs.back().set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 //p[5] is npc graphic
                 resource_manager.load_graphic(p[5], Graphic::NPC);
+                map.NPCs.back().set_texture(resource_manager.get_texture(p[5]));
                 //p[6] is npc level
                 //p[7] is
                 //p[8] is
