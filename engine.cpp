@@ -128,6 +128,9 @@ void Engine::process_input()
                 keyboard.dir = '2';
                 keyboard.right = true;
                 break;
+            case sf::Keyboard::E:
+                network.queueCommand("task=walk");
+                break;
             default:
                 break;
             }// end switch
@@ -308,6 +311,11 @@ void Engine::process_network()
             hero.set_dir(p[2]);
             network.set_pdir(p[2]);
             break;
+        }
+        case char2int("reload"):
+        {
+            map.clear();
+            network.queueLoadSequence();
         }
         case char2int("maxchat")://FINISHED
         {

@@ -30,27 +30,38 @@ void Map::center_to(sf::Vector2i value)
     center_pos_diff = center_pos - center_old_pos;
 }
 
+void Map::clear()
+{
+    mutex.lock();
+    items.clear();
+    NPCs.clear();
+    mutex.unlock();
+}
+
 void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)
 {
-    sf::Vector2f map_center;
+    mutex.lock();
+    sf::Vector2f map_offset;
     if(move_fraction.asSeconds() < 1/MOVEMENT_SPEED)
     {
-        map_center = (sf::Vector2f(center_old_pos) * p_per_tile) - screen_center
+        map_offset = (sf::Vector2f(center_old_pos) * p_per_tile) - screen_center
                      + (sf::Vector2f(center_pos_diff) * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
     }
     else
     {
-        map_center = (sf::Vector2f(center_pos) * p_per_tile) - screen_center;
+        map_offset = (sf::Vector2f(center_pos) * p_per_tile) - screen_center;
     }
 
-    sprite_rect.left = map_center.x + p_correction;
-    sprite_rect.top = map_center.y + p_correction;
+    sprite_rect.left = (map_offset.x + p_correction);
+    sprite_rect.top = (map_offset.y + p_correction);
 
     map_sprite.setTextureRect(sprite_rect);
     window.draw(map_sprite);
 
-    for(auto &i : NPCs)
-        i.draw(window, map_center, p_per_tile);
     for(auto &i : items)
-        i.draw(window, map_center, p_per_tile);
+        i.draw(window, map_offset, p_per_tile);
+    for(auto &i : NPCs)
+        i.draw(window, map_offset, p_per_tile);
+
+    mutex.unlock();
 }

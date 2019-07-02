@@ -3,6 +3,7 @@
 
 #include "npc.hpp"
 #include "item.hpp"
+#include <SFML/System/Mutex.hpp>
 #include <deque>
 
 class Map
@@ -24,6 +25,7 @@ private:
     sf::Vector2i center_old_pos;
     sf::Vector2i center_pos_diff;
 
+    sf::Mutex mutex;
 public:
     void set_map_size(sf::Vector2u value);
     void set_screen_size(sf::Vector2u value);
@@ -32,6 +34,7 @@ public:
     //move maps view to given position
     void center_to(sf::Vector2i value);
 
+    void clear();
     void draw(sf::RenderWindow& window, sf::Time move_fraction);
 };
 
