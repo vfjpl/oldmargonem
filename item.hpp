@@ -7,13 +7,14 @@
 class Item
 {
     sf::Sprite item_sprite;
+    sf::Vector2f p_correction;
     sf::Vector2i item_pos;
 
 public:
     void set_position(sf::Vector2i value);
     void set_texture(const sf::Texture& texture);
 
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window, sf::Vector2f map_pos, float p_per_tile);
 };
 
 #endif // ITEM_HPP_INCLUDED

@@ -32,22 +32,25 @@ void Map::center_to(sf::Vector2i value)
 
 void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)
 {
-    sf::Vector2f temp;
+    sf::Vector2f map_center;
     if(move_fraction.asSeconds() < 1/MOVEMENT_SPEED)
     {
-        temp.x = (center_old_pos.x * p_per_tile) + (p_correction) - (screen_center.x)
-                 + (center_pos_diff.x * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
-        temp.y = (center_old_pos.y * p_per_tile) + (p_correction) - (screen_center.y)
-                 + (center_pos_diff.y * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
+        map_center = (sf::Vector2f(center_old_pos) * p_per_tile) - screen_center
+                     + (sf::Vector2f(center_pos_diff) * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
     }
     else
     {
-        temp.x = (center_pos.x * p_per_tile) + (p_correction) - (screen_center.x);
-        temp.y = (center_pos.y * p_per_tile) + (p_correction) - (screen_center.y);
+        map_center = (sf::Vector2f(center_pos) * p_per_tile) - screen_center;
     }
-    sprite_rect.left = temp.x;
-    sprite_rect.top = temp.y;
+
+    sprite_rect.left = map_center.x + p_correction;
+    sprite_rect.top = map_center.y + p_correction;
 
     map_sprite.setTextureRect(sprite_rect);
     window.draw(map_sprite);
+
+    for(auto &i : NPCs)
+        i.draw(window, map_center, p_per_tile);
+    for(auto &i : items)
+        i.draw(window, map_center, p_per_tile);
 }
