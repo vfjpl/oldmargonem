@@ -10,8 +10,7 @@ class MyClock
     sf::Time move_time;
 
 public:
-    sf::Time getElapsedTime() const;
-    sf::Time getMoveTime() const;
+    float getMoveTime() const;
 
     //updates interrupt times
     void update();

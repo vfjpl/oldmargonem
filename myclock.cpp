@@ -1,14 +1,9 @@
 #include "myclock.hpp"
 #include "config.hpp"
 
-sf::Time MyClock::getElapsedTime() const
+float MyClock::getMoveTime() const
 {
-    return clock.getElapsedTime();
-}
-
-sf::Time MyClock::getMoveTime() const
-{
-    return move_time;
+    return move_time.asSeconds();
 }
 
 void MyClock::update()
@@ -20,7 +15,7 @@ void MyClock::update()
 
 bool MyClock::moveInterrupt()
 {
-    if(move_time.asSeconds() < 1/MOVEMENT_SPEED)
+    if(move_time < sf::seconds(1/MOVEMENT_SPEED))
         return false;
 
     move_time = sf::Time::Zero;

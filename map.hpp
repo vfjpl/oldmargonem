@@ -35,7 +35,7 @@ public:
     void center_to(sf::Vector2i value);
 
     void clear();
-    void draw(sf::RenderWindow& window, sf::Time move_fraction);
+    void draw(sf::RenderWindow& window, float move_fraction);
 };
 
 #endif // MAP_HPP_INCLUDED

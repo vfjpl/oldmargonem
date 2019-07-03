@@ -38,14 +38,15 @@ void Map::clear()
     mutex.unlock();
 }
 
-void Map::draw(sf::RenderWindow& window, sf::Time move_fraction)
+void Map::draw(sf::RenderWindow& window, float move_fraction)
 {
     mutex.lock();
+
     sf::Vector2f map_offset;
-    if(move_fraction.asSeconds() < 1/MOVEMENT_SPEED)
+    if(move_fraction < 1/MOVEMENT_SPEED)
     {
-        map_offset = (sf::Vector2f(center_old_pos) * p_per_tile) - screen_center
-                     + (sf::Vector2f(center_pos_diff) * p_per_tile * move_fraction.asSeconds() * MOVEMENT_SPEED);
+        map_offset = (sf::Vector2f(center_old_pos) * p_per_tile) - screen_center +
+                     (sf::Vector2f(center_pos_diff) * (p_per_tile * move_fraction * MOVEMENT_SPEED));
     }
     else
     {
