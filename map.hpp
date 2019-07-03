@@ -38,6 +38,8 @@ public:
 
     void clear();
     void draw(sf::RenderWindow& window, float move_fraction);
+
+    std::string findclose() const;
 };
 
 #endif // MAP_HPP_INCLUDED

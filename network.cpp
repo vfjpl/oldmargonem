@@ -110,9 +110,14 @@ void Network::queueMove(sf::Vector2i value)
         ml += ';' + std::to_string(value.x) + ',' + std::to_string(value.y);
 }
 
-void Network::queueCommand(const std::string& command)
+void Network::queueEnter()
 {
-    fifo.push(command);
+    fifo.emplace("task=walk");
+}
+
+void Network::queueFight(const std::string& value)
+{
+    fifo.emplace("auto=1&attack=" + value  + "&task=fight");
 }
 
 void Network::queueLoadSequence()
@@ -125,7 +130,6 @@ void Network::queueLoadSequence()
 
 std::string Network::sendRequest()
 {
-    //TODO: BATTLE
     std::string cmd;
     if(!fifo.empty())
     {

@@ -12,6 +12,11 @@ void NPC::set_texture(const sf::Texture& texture)
     p_correction = sf::Vector2f(texture.getSize())/2.f;
 }
 
+sf::Vector2i NPC::get_position() const
+{
+    return npc_pos;
+}
+
 void NPC::draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size)
 {
     npc_sprite.setPosition((sf::Vector2f(npc_pos) * map_tile_size) - p_correction - map_offset);

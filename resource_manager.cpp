@@ -22,6 +22,9 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
     case MAP:
         path = "/obrazki/miasta/";
         break;
+    case BATTLEPLACE:
+        path = "/obrazki/battle/";
+        break;
     case CHARACTER:
         path = "/obrazki/postacie";
         break;

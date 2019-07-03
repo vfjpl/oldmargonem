@@ -32,7 +32,8 @@ public:
     void login(const std::string& login, const std::string& password);
 
     void queueMove(sf::Vector2i value);
-    void queueCommand(const std::string& command);
+    void queueEnter();
+    void queueFight(const std::string& value);
     void queueLoadSequence();
 
     std::string sendRequest();

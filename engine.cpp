@@ -49,7 +49,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 
 Engine::Engine()
 {
-    setup_window(true);
+    setup_window(false);
     network.login();
     network.queueLoadSequence();
 }
@@ -130,8 +130,15 @@ void Engine::process_input()
                 keyboard.right = true;
                 break;
             case sf::Keyboard::E:
-                network.queueCommand("task=walk");
+                network.queueEnter();
                 break;
+            case sf::Keyboard::F:
+            {
+                std::string id = map.findclose();
+                if(!id.empty())
+                    network.queueFight(id);
+                break;
+            }
             default:
                 break;
             }// end switch
@@ -195,7 +202,6 @@ void Engine::draw_frame()
 void Engine::process_network()
 {
     std::string body = network.sendRequest();
-    bool alldata = false;
 
     for(size_t old_pos = 0;;)
     {
@@ -396,6 +402,10 @@ void Engine::process_network()
             }// end switch
             break;
         }
+        case char2int("battleref")://FINISHED
+        {
+            break;
+        }
         case char2int("maxchat")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
@@ -424,7 +434,6 @@ void Engine::process_network()
         }
         case char2int("end")://FINISHED
         {
-            alldata = true;
             break;
         }
         default:
@@ -437,7 +446,4 @@ void Engine::process_network()
             break;
         old_pos = new_pos + 11;
     }// end for
-
-    if(!alldata)
-        std::cout << "INVALID PACKET\n";
 }

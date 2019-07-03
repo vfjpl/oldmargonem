@@ -7,6 +7,7 @@
 enum Graphic
 {
     MAP,
+    BATTLEPLACE,
     CHARACTER,
     ITEM,
     NPC,
