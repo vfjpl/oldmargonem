@@ -36,6 +36,7 @@ void Map::clear()
 
     items.clear();
     NPCs.clear();
+    players.clear();
 
     mutex.unlock();
 }

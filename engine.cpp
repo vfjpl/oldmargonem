@@ -49,7 +49,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 
 Engine::Engine()
 {
-    setup_window(false);
+    setup_window(true);
     sf::Vector2u screen_size = window.getSize();
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
@@ -205,6 +205,18 @@ void Engine::process_network()
 
         switch(str2int(cmd))
         {
+        case char2int("msg"):
+        {
+            std::string parm = line.substr(colon + 1);
+            std::cout << parm << '\n';
+            break;
+        }
+        case char2int("chat"):
+        {
+            std::string parm = line.substr(colon + 1);
+            std::cout << parm << '\n';
+            break;
+        }
         case char2int("element"):
         {
             std::string parm = line.substr(colon + 1);
@@ -344,18 +356,34 @@ void Engine::process_network()
             std::vector<std::string> p2 = split2(p1[1], '=', ';');
 
             //p1[0] is other id
-
             //p2[1-2] is other position
-            map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
             //p2[3] is other direction
+            map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
             map.players[p1[0]].set_dir(p2[3]);
             break;
         }
         case char2int("delete"):
         {
             std::string parm = line.substr(colon + 1);
+            std::vector<std::string> p = split(parm, ',');
 
-            std::cout << cmd << ' ' << parm << " NOT IMPLEMENTED\n";
+            //p[0] is id
+            //p[1] is type
+            switch(str2int(p[1]))
+            {
+            case char2int("npc"):
+                map.NPCs.erase(p[0]);
+                break;
+            case char2int("item"):
+                map.items.erase(p[0]);
+                break;
+            case char2int("other"):
+                map.players.erase(p[0]);
+                break;
+            default:
+                std::cout << cmd << ' ' << p[1] << " NOT IMPLEMENTED\n";
+                break;
+            }// end switch
             break;
         }
         case char2int("maxchat")://FINISHED
