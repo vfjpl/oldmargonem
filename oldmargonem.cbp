@@ -58,6 +58,8 @@
 		<Unit filename="network.hpp" />
 		<Unit filename="npc.cpp" />
 		<Unit filename="npc.hpp" />
+		<Unit filename="other.cpp" />
+		<Unit filename="other.hpp" />
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
 		<Extensions>

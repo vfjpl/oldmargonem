@@ -14,7 +14,7 @@ public:
     void set_position(sf::Vector2i value);
     void set_texture(const sf::Texture& texture);
 
-    void draw(sf::RenderWindow& window, sf::Vector2f map_offset, float p_per_tile);
+    void draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size);
 };
 
 #endif // ITEM_HPP_INCLUDED

@@ -16,8 +16,8 @@ class Hero
 
 public:
     void set_screen_size(sf::Vector2u value);
-    void set_dir(const std::string& value);
     void set_texture(const sf::Texture& texture);
+    void set_dir(const std::string& value);
     void set_pos(sf::Vector2i value);
 
     //movement relative to current position

@@ -3,14 +3,16 @@
 
 #include "npc.hpp"
 #include "item.hpp"
+#include "other.hpp"
 #include <SFML/System/Mutex.hpp>
-#include <deque>
+#include <map>
 
 class Map
 {
 public:
-    std::deque<NPC> NPCs;
-    std::deque<Item> items;
+    std::map<std::string, Item> items;
+    std::map<std::string, NPC> NPCs;
+    std::map<std::string, Other> players;
 
 private:
     sf::Sprite map_sprite;
@@ -32,7 +34,7 @@ public:
     void set_texture(const sf::Texture& texture);
 
     //move maps view to given position
-    void center_to(sf::Vector2i value);
+    void center(sf::Vector2i value);
 
     void clear();
     void draw(sf::RenderWindow& window, float move_fraction);

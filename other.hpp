@@ -1,20 +1,23 @@
-#ifndef NPC_HPP_INCLUDED
-#define NPC_HPP_INCLUDED
+#ifndef OTHER_HPP_INCLUDED
+#define OTHER_HPP_INCLUDED
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-class NPC
+class Other
 {
-    sf::Sprite npc_sprite;
+    sf::Sprite other_sprite;
+    sf::IntRect sprite_rect;
+    sf::Vector2f p_per_tile;
     sf::Vector2f p_correction;
-    sf::Vector2i npc_pos;
+    sf::Vector2i other_pos;
 
 public:
     void set_position(sf::Vector2i value);
     void set_texture(const sf::Texture& texture);
+    void set_dir(const std::string& value);
 
     void draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size);
 };
 
-#endif // NPC_HPP_INCLUDED
+#endif // OTHER_HPP_INCLUDED

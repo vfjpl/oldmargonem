@@ -179,7 +179,7 @@ void Engine::game_logic()
         hero.move(keyboard.getPosChange());
 
         sf::Vector2i pos = hero.getPosition();
-        map.center_to(pos);
+        map.center(pos);
         network.queueMove(pos);
     }
     clock.update();
@@ -214,32 +214,51 @@ void Engine::process_network()
             switch(str2int(p[0]))
             {
             case char2int("item"):
-                map.items.emplace_back();
                 //p[1] is item id
+
                 //p[2] is item name
                 //p[3-4] is item position
-                map.items.back().set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.items[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 //p[5] is item graphic
                 resource_manager.load_graphic(p[5], Graphic::ITEM);
-                map.items.back().set_texture(resource_manager.get_texture(p[5]));
+                map.items[p[1]].set_texture(resource_manager.get_texture(p[5]));
                 break;
             case char2int("npc"):
-                map.NPCs.emplace_back();
                 //p[1] is npc id
+
                 //p[2] is npc nick
                 //p[3-4] is npc position
-                map.NPCs.back().set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.NPCs[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 //p[5] is npc graphic
                 resource_manager.load_graphic(p[5], Graphic::NPC);
-                map.NPCs.back().set_texture(resource_manager.get_texture(p[5]));
+                map.NPCs[p[1]].set_texture(resource_manager.get_texture(p[5]));
                 //p[6] is npc level
                 //p[7] is
                 //p[8] is
                 //p[9] is npc group fight
                 //p[10] is npc questmark
                 break;
+            case char2int("other"):
+                //p[1] is other id
+
+                //p[2] is other nick
+                //p[3-4] is other position
+                map.players[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                //p[5] is other profesion
+                //p[6] is other direction
+
+                //p[7] is other graphic
+
+                //p[8] is
+                //p[9] is other level
+                //p[10] is other clan tag
+
+                resource_manager.load_graphic(p[7], Graphic::CHARACTER);
+                map.players[p[1]].set_texture(resource_manager.get_texture(p[7]));
+                map.players[p[1]].set_dir(p[6]);
+                break;
             default:
-                std::cout << p[0] << " NOT IMPLEMENTED\n";
+                std::cout << cmd << ' ' << p[0] << " NOT IMPLEMENTED\n";
                 break;
             }// end switch
             break;
@@ -252,7 +271,7 @@ void Engine::process_network()
             //p[0-1] is hero pos
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
             hero.set_pos(pos);
-            map.center_to(pos);
+            map.center(pos);
             //p[2] is hero direction
 
             //p[3] is hero nick
@@ -306,7 +325,7 @@ void Engine::process_network()
             //p[0-1] is hero pos
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
             hero.set_pos(pos);
-            map.center_to(pos);
+            map.center(pos);
             //p[2] is hero dir
             hero.set_dir(p[2]);
             network.set_pdir(p[2]);
@@ -316,6 +335,28 @@ void Engine::process_network()
         {
             map.clear();
             network.queueLoadSequence();
+            break;
+        }
+        case char2int("othermove"):
+        {
+            std::string parm = line.substr(colon + 1);
+            std::vector<std::string> p1 = split(parm, ',');
+            std::vector<std::string> p2 = split2(p1[1], '=', ';');
+
+            //p1[0] is other id
+
+            //p2[1-2] is other position
+            map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
+            //p2[3] is other direction
+            map.players[p1[0]].set_dir(p2[3]);
+            break;
+        }
+        case char2int("delete"):
+        {
+            std::string parm = line.substr(colon + 1);
+
+            std::cout << cmd << ' ' << parm << " NOT IMPLEMENTED\n";
+            break;
         }
         case char2int("maxchat")://FINISHED
         {

@@ -23,7 +23,7 @@ void Map::set_texture(const sf::Texture& texture)
     p_correction = p_per_tile/2;
 }
 
-void Map::center_to(sf::Vector2i value)
+void Map::center(sf::Vector2i value)
 {
     center_old_pos = center_pos;
     center_pos = value;
@@ -33,8 +33,10 @@ void Map::center_to(sf::Vector2i value)
 void Map::clear()
 {
     mutex.lock();
+
     items.clear();
     NPCs.clear();
+
     mutex.unlock();
 }
 
@@ -60,9 +62,11 @@ void Map::draw(sf::RenderWindow& window, float move_fraction)
     window.draw(map_sprite);
 
     for(auto &i : items)
-        i.draw(window, map_offset, p_per_tile);
+        i.second.draw(window, map_offset, p_per_tile);
     for(auto &i : NPCs)
-        i.draw(window, map_offset, p_per_tile);
+        i.second.draw(window, map_offset, p_per_tile);
+    for(auto &i : players)
+        i.second.draw(window, map_offset, p_per_tile);
 
     mutex.unlock();
 }
