@@ -360,7 +360,7 @@ void Engine::process_network()
             //p2[0] is event
             switch(str2int(p2[0]))
             {
-            case char2int("walk"):
+            case char2int("move"):
                 //p2[1-2] is id position
                 map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
                 //p2[3] is id direction
