@@ -50,9 +50,6 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 Engine::Engine()
 {
     setup_window(true);
-    sf::Vector2u screen_size = window.getSize();
-    map.set_screen_size(screen_size);
-    hero.set_screen_size(screen_size);
     network.login();
     network.queueLoadSequence();
 }
@@ -99,6 +96,10 @@ void Engine::setup_window(bool fullscreen)
     }
     //window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
+
+    sf::Vector2u screen_size = window.getSize();
+    map.set_screen_size(screen_size);
+    hero.set_screen_size(screen_size);
 }
 
 void Engine::process_input()
@@ -349,20 +350,29 @@ void Engine::process_network()
             network.queueLoadSequence();
             break;
         }
-        case char2int("othermove"):
+        case char2int("othermove")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p1 = split(parm, ',');
             std::vector<std::string> p2 = split2(p1[1], '=', ';');
 
-            //p1[0] is other id
-            //p2[1-2] is other position
-            //p2[3] is other direction
-            map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
-            map.players[p1[0]].set_dir(p2[3]);
+            //p1[0] is id
+            //p2[0] is event
+            switch(str2int(p2[0]))
+            {
+            case char2int("walk"):
+                //p2[1-2] is id position
+                map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
+                //p2[3] is id direction
+                map.players[p1[0]].set_dir(p2[3]);
+                break;
+            default:
+                std::cout << cmd << ' ' << p2[0] << " NOT IMPLEMENTED\n";
+                break;
+            }// end switch
             break;
         }
-        case char2int("delete"):
+        case char2int("delete")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split(parm, ',');
