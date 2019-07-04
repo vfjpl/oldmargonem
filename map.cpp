@@ -2,19 +2,6 @@
 #include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
-namespace
-{
-bool checkclose(sf::Vector2i first, sf::Vector2i second)
-{
-    sf::Vector2i temp = first - second;
-    if(temp.x >= -1 && temp.x <= 1)
-        if(temp.y >= -1 && temp.y <= 1)
-            return true;
-
-    return false;
-}
-}
-
 void Map::set_map_size(sf::Vector2u value)
 {
     map_size = value;
@@ -88,8 +75,11 @@ void Map::draw(sf::RenderWindow& window, float move_fraction)
 std::string Map::findclose() const
 {
     for(auto &i : NPCs)
-        if(checkclose(center_pos, i.second.get_position()))
-            return i.first;
-
+    {
+        sf::Vector2i temp = center_pos - i.second.get_position();
+        if(temp.x >= -1 && temp.x <= 1)
+            if(temp.y >= -1 && temp.y <= 1)
+                return i.first;
+    }
     return std::string();
 }

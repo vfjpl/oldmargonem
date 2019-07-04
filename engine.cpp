@@ -133,12 +133,8 @@ void Engine::process_input()
                 network.queueEnter();
                 break;
             case sf::Keyboard::F:
-            {
-                std::string id = map.findclose();
-                if(!id.empty())
-                    network.queueFight(id);
+                network.queueFight(map.findclose());
                 break;
-            }
             default:
                 break;
             }// end switch
