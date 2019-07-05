@@ -139,6 +139,9 @@ void Engine::process_input()
             case sf::Keyboard::F:
                 network.queueFight(map.findclose());
                 break;
+            case sf::Keyboard::Escape:
+                window.close();
+                break;
             default:
                 break;
             }// end switch
@@ -175,7 +178,7 @@ void Engine::process_input()
             break;
         }
         }// end switch
-    }
+    }// end while
 }
 
 void Engine::game_logic()
