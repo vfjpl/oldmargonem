@@ -36,7 +36,10 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
     std::vector<std::string> temp;
     for(size_t old_pos = 0;;)
     {
-        old_pos = parm.find(first, old_pos) + 1;
+        old_pos = parm.find(first, old_pos);
+        if(old_pos == std::string::npos)
+            break;
+        ++old_pos;
         size_t new_pos = parm.find(second, old_pos);
         temp.push_back(parm.substr(old_pos, new_pos - old_pos));
         if(new_pos == std::string::npos)
@@ -96,6 +99,7 @@ void Engine::setup_window(bool fullscreen)
     }
     //window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
+    window.clear();
 
     sf::Vector2u screen_size = window.getSize();
     map.set_screen_size(screen_size);
@@ -398,8 +402,18 @@ void Engine::process_network()
             }// end switch
             break;
         }
+        case char2int("battlemsg"):
+        {
+            std::string parm = line.substr(colon + 1);
+            std::vector<std::string> p = split(parm, ';');
+
+            network.set_bseq(p[0]);
+            break;
+        }
         case char2int("battleref")://FINISHED
         {
+            std::string parm = line.substr(colon + 1);
+            resource_manager.load_graphic(parm, Graphic::BATTLEPLACE);
             break;
         }
         case char2int("maxchat")://FINISHED
