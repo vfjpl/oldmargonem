@@ -36,7 +36,8 @@ public:
     void queueFight(const std::string& value);
     void queueLoadSequence();
 
-    std::string sendRequest();
+    void sendRequest();
+    std::string receiveResponse();
 };
 
 #endif // NETWORK_HPP_INCLUDED

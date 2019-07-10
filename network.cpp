@@ -93,9 +93,9 @@ void Network::login(const std::string& login, const std::string& password)
     pid = getPidValue(body);
 
     //Cookies
-    Poco::Net::NameValueCollection cookies;
     std::vector<Poco::Net::HTTPCookie> cookies_vec;
     response.getCookies(cookies_vec);
+    Poco::Net::NameValueCollection cookies;
     for(auto &i : cookies_vec)
         cookies.add(i.getName(), i.getValue());
     cookies.add("mchar_id", pid);
@@ -128,7 +128,7 @@ void Network::queueLoadSequence()
     fifo.emplace("initlvl=4&task=init");
 }
 
-std::string Network::sendRequest()
+void Network::sendRequest()
 {
     std::string cmd;
     if(!fifo.empty())
@@ -157,6 +157,10 @@ std::string Network::sendRequest()
                    "&a="+getTimeString());
 
     session.sendRequest(request);
+}
+
+std::string Network::receiveResponse()
+{
     Poco::Net::HTTPResponse response;
     return toString(session.receiveResponse(response));
 }

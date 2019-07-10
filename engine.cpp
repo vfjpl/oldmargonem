@@ -34,9 +34,8 @@ std::vector<std::string> split(const std::string& parm, char delim)
 std::vector<std::string> split2(const std::string& parm, char first, char second)
 {
     std::vector<std::string> temp;
-    for(size_t old_pos = 0;;)
+    for(size_t old_pos = parm.find(first);;)
     {
-        old_pos = parm.find(first, old_pos);
         if(old_pos == std::string::npos)
             break;
         ++old_pos;
@@ -44,7 +43,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
         temp.push_back(parm.substr(old_pos, new_pos - old_pos));
         if(new_pos == std::string::npos)
             break;
-        old_pos = new_pos + 1;
+        old_pos = parm.find(first, new_pos + 1);
     }
     return temp;
 }
@@ -72,13 +71,13 @@ bool Engine::run_game()
     process_input();
     game_logic();
     draw_frame();
-    window.display();
 
     return window.isOpen();
 }
 
 bool Engine::run_network()
 {
+    network.sendRequest();
     process_network();
 
     return window.isOpen();
@@ -97,7 +96,6 @@ void Engine::setup_window(bool fullscreen)
         mode.height = (mode.height*2)/3;
         window.create(mode, "oldmargonem", sf::Style::Close);
     }
-    //window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
     window.clear();
 
@@ -200,11 +198,12 @@ void Engine::draw_frame()
 {
     map.draw(window, clock.getMoveTime());
     hero.draw(window);
+    window.display();
 }
 
 void Engine::process_network()
 {
-    std::string body = network.sendRequest();
+    std::string body = network.receiveResponse();
 
     for(size_t old_pos = 0;;)
     {
