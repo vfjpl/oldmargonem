@@ -104,6 +104,15 @@ void Engine::setup_window(bool fullscreen)
     sf::Vector2u screen_size = window.getSize();
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
+    gui.set_screen_size(screen_size);
+}
+
+void Engine::load_gui()
+{
+    resource_manager.load_graphic("loading.png", Graphic::GAME);
+    gui.set_texture(resource_manager.get_texture("loading.png"));
+    resource_manager.load_graphic("panel.png", Graphic::INTERFACE);
+    resource_manager.load_graphic("equip.png", Graphic::INTERFACE);
 }
 
 void Engine::process_input()
@@ -243,6 +252,7 @@ void Engine::process_network()
             //p[19] is hero profession name
             resource_manager.set_mpath(p[11]);
 
+            load_gui();
 
             resource_manager.load_graphic(p[10], Graphic::HERO);
             hero.set_texture(resource_manager.get_texture(p[10]));
