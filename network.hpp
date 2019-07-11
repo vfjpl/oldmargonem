@@ -26,6 +26,7 @@ public:
     void set_lastch(const std::string& value);
     void set_lastcch(const std::string& value);
     void set_bseq(const std::string& value);
+    //string because we get dir from network as string
     void set_pdir(const std::string& value);
 
     //logs in and sets necessary cookies

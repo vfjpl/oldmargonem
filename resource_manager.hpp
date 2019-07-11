@@ -6,9 +6,11 @@
 
 enum Graphic
 {
+    GAME,
+    INTERFACE,
     MAP,
     BATTLEPLACE,
-    CHARACTER,
+    HERO,
     ITEM,
     NPC,
 };
@@ -20,7 +22,7 @@ class Resource_Manager
     unsigned long size_in_bytes = 0;
 
 public:
-    //set server address for downloading graphics
+    //set download server address for graphics
     void set_mpath(const std::string& value);
     //give you texture that you can use with sprites
     const sf::Texture& get_texture(const std::string& name) const;

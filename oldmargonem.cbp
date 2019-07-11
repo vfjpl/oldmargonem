@@ -33,6 +33,7 @@
 			<Add option="-std=c++1z" />
 		</Compiler>
 		<Linker>
+			<Add library="tgui" />
 			<Add library="PocoNet" />
 			<Add library="PocoFoundation" />
 			<Add library="sfml-network" />
@@ -43,6 +44,8 @@
 		<Unit filename="config.hpp" />
 		<Unit filename="engine.cpp" />
 		<Unit filename="engine.hpp" />
+		<Unit filename="gui.cpp" />
+		<Unit filename="gui.hpp" />
 		<Unit filename="hero.cpp" />
 		<Unit filename="hero.hpp" />
 		<Unit filename="item.cpp" />

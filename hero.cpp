@@ -19,7 +19,7 @@ void Hero::set_texture(const sf::Texture& texture)
 
 void Hero::set_dir(const std::string& value)
 {
-    sprite_rect.top = std::stoul(value) * p_per_tile.y;
+    sprite_rect.top = (value.front() - '0') * p_per_tile.y;
     hero_sprite.setTextureRect(sprite_rect);
 }
 
@@ -28,9 +28,27 @@ void Hero::set_pos(sf::Vector2i value)
     hero_pos = value;
 }
 
-void Hero::move(sf::Vector2i value)
+void Hero::move(char dir)
 {
-    hero_pos += value;
+    dir -= '0';//change (0,1,2,3) character to number
+
+    switch(dir)
+    {
+    case 0:
+        ++hero_pos.y;
+        break;
+    case 1:
+        --hero_pos.x;
+        break;
+    case 2:
+        ++hero_pos.x;
+        break;
+    case 3:
+        --hero_pos.y;
+        break;
+    }// end switch
+    sprite_rect.top = dir * p_per_tile.y;
+    hero_sprite.setTextureRect(sprite_rect);
 }
 
 sf::Vector2i Hero::getPosition() const

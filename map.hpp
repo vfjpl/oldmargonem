@@ -1,8 +1,8 @@
 #ifndef MAP_HPP_INCLUDED
 #define MAP_HPP_INCLUDED
 
-#include "npc.hpp"
 #include "item.hpp"
+#include "npc.hpp"
 #include "other.hpp"
 #include <SFML/System/Mutex.hpp>
 #include <map>
@@ -28,6 +28,7 @@ private:
     sf::Vector2i center_pos_diff;
 
     sf::Mutex mutex;
+
 public:
     void set_map_size(sf::Vector2u value);
     void set_screen_size(sf::Vector2u value);

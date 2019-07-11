@@ -2,32 +2,19 @@
 
 bool MyKeyboard::anyKey() const
 {
+    if(block)
+        return false;
+
     switch(dir.front())
     {
-    case '3':
-        return up;
-    case '1':
-        return left;
     case '0':
-        return down;
+        return keys[0];
+    case '1':
+        return keys[1];
     case '2':
-        return right;
+        return keys[2];
+    case '3':
+        return keys[3];
     }// end switch
     return false;
-}
-
-sf::Vector2i MyKeyboard::getPosChange() const
-{
-    switch(dir.front())
-    {
-    case '3':
-        return sf::Vector2i(0, -1);
-    case '1':
-        return sf::Vector2i(-1, 0);
-    case '0':
-        return sf::Vector2i(0, 1);
-    case '2':
-        return sf::Vector2i(1, 0);
-    }// end switch
-    return sf::Vector2i(0, 0);
 }

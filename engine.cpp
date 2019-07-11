@@ -99,6 +99,8 @@ void Engine::setup_window(bool fullscreen)
     window.setKeyRepeatEnabled(false);
     window.clear();
 
+    //gui.tgui.setTarget(window);
+
     sf::Vector2u screen_size = window.getSize();
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
@@ -109,6 +111,7 @@ void Engine::process_input()
     sf::Event event;
     while(window.pollEvent(event))
     {
+        //gui.tgui.handleEvent(event);
         switch(event.type)
         {
         case sf::Event::KeyPressed:
@@ -117,25 +120,25 @@ void Engine::process_input()
             {
             case sf::Keyboard::W:
                 keyboard.dir = '3';
-                keyboard.up = true;
+                keyboard.keys[3] = true;
                 break;
             case sf::Keyboard::A:
                 keyboard.dir = '1';
-                keyboard.left = true;
+                keyboard.keys[1] = true;
                 break;
             case sf::Keyboard::S:
                 keyboard.dir = '0';
-                keyboard.down = true;
+                keyboard.keys[0] = true;
                 break;
             case sf::Keyboard::D:
                 keyboard.dir = '2';
-                keyboard.right = true;
-                break;
-            case sf::Keyboard::E:
-                network.queueEnter();
+                keyboard.keys[2] = true;
                 break;
             case sf::Keyboard::F:
                 network.queueFight(map.findclose());
+                break;
+            case sf::Keyboard::E:
+                network.queueEnter();
                 break;
             case sf::Keyboard::Escape:
                 window.close();
@@ -150,16 +153,16 @@ void Engine::process_input()
             switch(event.key.code)
             {
             case sf::Keyboard::W:
-                keyboard.up = false;
+                keyboard.keys[3] = false;
                 break;
             case sf::Keyboard::A:
-                keyboard.left = false;
+                keyboard.keys[1] = false;
                 break;
             case sf::Keyboard::S:
-                keyboard.down = false;
+                keyboard.keys[0] = false;
                 break;
             case sf::Keyboard::D:
-                keyboard.right = false;
+                keyboard.keys[2] = false;
                 break;
             default:
                 break;
@@ -184,8 +187,7 @@ void Engine::game_logic()
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
         network.set_pdir(keyboard.dir);
-        hero.set_dir(keyboard.dir);
-        hero.move(keyboard.getPosChange());
+        hero.move(keyboard.dir.front());
 
         sf::Vector2i pos = hero.getPosition();
         map.center(pos);
@@ -198,6 +200,7 @@ void Engine::draw_frame()
 {
     map.draw(window, clock.getMoveTime());
     hero.draw(window);
+    gui.draw(window);
     window.display();
 }
 
@@ -214,87 +217,13 @@ void Engine::process_network()
 
         switch(str2int(cmd))
         {
-        case char2int("msg"):
-        {
-            std::string parm = line.substr(colon + 1);
-            std::cout << parm << '\n';
-            break;
-        }
-        case char2int("chat"):
-        {
-            std::string parm = line.substr(colon + 1);
-            std::cout << parm << '\n';
-            break;
-        }
-        case char2int("element"):
-        {
-            std::string parm = line.substr(colon + 1);
-            std::vector<std::string> p = split2(parm, '=', ';');
-
-            //p[0] element type
-            switch(str2int(p[0]))
-            {
-            case char2int("item"):
-                //p[1] is item id
-
-                //p[2] is item name
-                //p[3-4] is item position
-                map.items[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
-                //p[5] is item graphic
-                resource_manager.load_graphic(p[5], Graphic::ITEM);
-                map.items[p[1]].set_texture(resource_manager.get_texture(p[5]));
-                break;
-            case char2int("npc"):
-                //p[1] is npc id
-
-                //p[2] is npc nick
-                //p[3-4] is npc position
-                map.NPCs[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
-                //p[5] is npc graphic
-                resource_manager.load_graphic(p[5], Graphic::NPC);
-                map.NPCs[p[1]].set_texture(resource_manager.get_texture(p[5]));
-                //p[6] is npc level
-                //p[7] is
-                //p[8] is
-                //p[9] is npc group fight
-                //p[10] is npc questmark
-                break;
-            case char2int("other"):
-                //p[1] is other id
-
-                //p[2] is other nick
-                //p[3-4] is other position
-                map.players[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
-                //p[5] is other profesion
-                //p[6] is other direction
-
-                //p[7] is other graphic
-
-                //p[8] is
-                //p[9] is other level
-                //p[10] is other clan tag
-
-                resource_manager.load_graphic(p[7], Graphic::CHARACTER);
-                map.players[p[1]].set_texture(resource_manager.get_texture(p[7]));
-                map.players[p[1]].set_dir(p[6]);
-                break;
-            default:
-                std::cout << cmd << ' ' << p[0] << " NOT IMPLEMENTED\n";
-                break;
-            }// end switch
-            break;
-        }
         case char2int("hero"):
         {
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split2(parm, '=', ';');
 
             //p[0-1] is hero pos
-            sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
-            hero.set_pos(pos);
-            map.center(pos);
             //p[2] is hero direction
-
             //p[3] is hero nick
             //p[4] is
             //p[5] is hero level
@@ -303,22 +232,24 @@ void Engine::process_network()
             //p[8] is hero gold
             //p[9] is
             //p[10] is hero graphic
-
             //p[11] is mpath
-
             //p[12] is
             //p[13] is
             //p[14] is
             //p[15] is hero profession shortcut
-            //p[16] is hero base strenght
+            //p[16] is hero base strength
             //p[17] is hero base agility
-            //p[18] is hero base inteligence
+            //p[18] is hero base intelligence
             //p[19] is hero profession name
-
             resource_manager.set_mpath(p[11]);
-            resource_manager.load_graphic(p[10], Graphic::CHARACTER);
+
+
+            resource_manager.load_graphic(p[10], Graphic::HERO);
             hero.set_texture(resource_manager.get_texture(p[10]));
+            sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
+            hero.set_pos(pos);
             hero.set_dir(p[2]);
+            map.center(pos);
             network.set_pdir(p[2]);
             break;
         }
@@ -328,14 +259,14 @@ void Engine::process_network()
             std::vector<std::string> p = split(parm, ';');
 
             //p[0-1] is map size
-            map.set_map_size(sf::Vector2u(std::stoul(p[0]), std::stoul(p[1])));
             //p[2] is map graphic
-            resource_manager.load_graphic(p[2], Graphic::MAP);
-            map.set_texture(resource_manager.get_texture(p[2]));
             //p[3] is map name
             //p[4] is map pvp
             //p[5] is battle background
             //p[6] is map id
+            resource_manager.load_graphic(p[2], Graphic::MAP);
+            map.set_map_size(sf::Vector2u(std::stoul(p[0]), std::stoul(p[1])));
+            map.set_texture(resource_manager.get_texture(p[2]));
             break;
         }
         case char2int("move")://FINISHED
@@ -344,18 +275,62 @@ void Engine::process_network()
             std::vector<std::string> p = split(parm, ',');
 
             //p[0-1] is hero pos
+            //p[2] is hero dir
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
             hero.set_pos(pos);
-            map.center(pos);
-            //p[2] is hero dir
             hero.set_dir(p[2]);
+            map.center(pos);
             network.set_pdir(p[2]);
             break;
         }
-        case char2int("reload"):
+        case char2int("element"):
         {
-            map.clear();
-            network.queueLoadSequence();
+            std::string parm = line.substr(colon + 1);
+            std::vector<std::string> p = split2(parm, '=', ';');
+
+            //p[0] element type
+            //p[1] is item id
+            switch(str2int(p[0]))
+            {
+            case char2int("item"):
+                //p[2] is item name
+                //p[3-4] is item position
+                //p[5] is item graphic
+                resource_manager.load_graphic(p[5], Graphic::ITEM);
+                map.items[p[1]].set_texture(resource_manager.get_texture(p[5]));
+                map.items[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                break;
+            case char2int("npc"):
+                //p[2] is npc nick
+                //p[3-4] is npc position
+                //p[5] is npc graphic
+                //p[6] is npc level
+                //p[7] is
+                //p[8] is
+                //p[9] is npc group fight
+                //p[10] is npc questmark
+                resource_manager.load_graphic(p[5], Graphic::NPC);
+                map.NPCs[p[1]].set_texture(resource_manager.get_texture(p[5]));
+                map.NPCs[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                break;
+            case char2int("other"):
+                //p[2] is other nick
+                //p[3-4] is other position
+                //p[5] is other profession
+                //p[6] is other direction
+                //p[7] is other graphic
+                //p[8] is
+                //p[9] is other level
+                //p[10] is other clan tag
+                resource_manager.load_graphic(p[7], Graphic::HERO);
+                map.players[p[1]].set_texture(resource_manager.get_texture(p[7]));
+                map.players[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.players[p[1]].set_dir(p[6]);
+                break;
+            default:
+                std::cout << cmd << ' ' << p[0] << " NOT IMPLEMENTED\n";
+                break;
+            }// end switch
             break;
         }
         case char2int("othermove")://FINISHED
@@ -370,8 +345,8 @@ void Engine::process_network()
             {
             case char2int("move"):
                 //p2[1-2] is id position
-                map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
                 //p2[3] is id direction
+                map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
                 map.players[p1[0]].set_dir(p2[3]);
                 break;
             default:
@@ -389,11 +364,11 @@ void Engine::process_network()
             //p[1] is type
             switch(str2int(p[1]))
             {
-            case char2int("npc"):
-                map.NPCs.erase(p[0]);
-                break;
             case char2int("item"):
                 map.items.erase(p[0]);
+                break;
+            case char2int("npc"):
+                map.NPCs.erase(p[0]);
                 break;
             case char2int("other"):
                 map.players.erase(p[0]);
@@ -412,7 +387,7 @@ void Engine::process_network()
             network.set_bseq(p[0]);
             break;
         }
-        case char2int("battleref")://FINISHED
+        case char2int("battleref"):
         {
             std::string parm = line.substr(colon + 1);
             resource_manager.load_graphic(parm, Graphic::BATTLEPLACE);
@@ -434,6 +409,12 @@ void Engine::process_network()
         {
             std::string parm = line.substr(colon + 1);
             network.set_ev(parm);
+            break;
+        }
+        case char2int("reload"):
+        {
+            map.clear();
+            network.queueLoadSequence();
             break;
         }
         case char2int("xy")://FINISHED

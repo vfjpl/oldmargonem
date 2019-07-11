@@ -1,6 +1,7 @@
 #ifndef ENGINE_HPP_INCLUDED
 #define ENGINE_HPP_INCLUDED
 
+#include "gui.hpp"
 #include "map.hpp"
 #include "network.hpp"
 #include "hero.hpp"
@@ -11,6 +12,7 @@
 class Engine
 {
     sf::RenderWindow window;
+    Gui gui;
     Map map;
     Network network;
     Hero hero;

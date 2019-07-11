@@ -15,7 +15,6 @@ public:
     void set_texture(const sf::Texture& texture);
 
     sf::Vector2i get_position() const;
-
     void draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size);
 };
 
