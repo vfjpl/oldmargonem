@@ -98,21 +98,27 @@ void Engine::setup_window(bool fullscreen)
     }
     window.setKeyRepeatEnabled(false);
     window.clear();
-
-    //gui.tgui.setTarget(window);
-
-    sf::Vector2u screen_size = window.getSize();
-    map.set_screen_size(screen_size);
-    hero.set_screen_size(screen_size);
-    gui.set_screen_size(screen_size);
+    gui.tgui.setTarget(window);
 }
 
-void Engine::load_gui()
+void Engine::load_gui_data()
 {
+    if(gui.isDataLoaded())
+        return;
+
+    gui.set_screen_size(window.getSize());
+
     resource_manager.load_graphic("loading.png", Graphic::GAME);
-    gui.set_texture(resource_manager.get_texture("loading.png"));
+    gui.set_loading_texture(resource_manager.get_texture("loading.png"));
     resource_manager.load_graphic("panel.png", Graphic::INTERFACE);
+    gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
     resource_manager.load_graphic("equip.png", Graphic::INTERFACE);
+
+    sf::Vector2u screen_size = gui.leftoverScreenSize();
+    map.set_screen_size(screen_size);
+    hero.set_screen_size(screen_size);
+
+    gui.dataLoadCompleted();
 }
 
 void Engine::process_input()
@@ -120,7 +126,7 @@ void Engine::process_input()
     sf::Event event;
     while(window.pollEvent(event))
     {
-        //gui.tgui.handleEvent(event);
+        gui.tgui.handleEvent(event);
         switch(event.type)
         {
         case sf::Event::KeyPressed:
@@ -251,8 +257,7 @@ void Engine::process_network()
             //p[18] is hero base intelligence
             //p[19] is hero profession name
             resource_manager.set_mpath(p[11]);
-
-            load_gui();
+            load_gui_data();//we need mpath
 
             resource_manager.load_graphic(p[10], Graphic::HERO);
             hero.set_texture(resource_manager.get_texture(p[10]));

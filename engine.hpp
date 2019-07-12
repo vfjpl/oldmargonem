@@ -29,7 +29,7 @@ private:
     bool run_game();
     bool run_network();
     void setup_window(bool fullscreen);
-    void load_gui();
+    void load_gui_data();
 
 
     void process_input();
