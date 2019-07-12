@@ -118,6 +118,7 @@ void Engine::load_gui_data()
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
 
+    gui.setupTGUI();
     gui.dataLoadCompleted();
 }
 
@@ -394,6 +395,12 @@ void Engine::process_network()
             }// end switch
             break;
         }
+        case char2int("chat"):
+        {
+            std::string parm = line.substr(colon + 1);
+            gui.addChatMessage(parm);
+            break;
+        }
         case char2int("battlemsg"):
         {
             std::string parm = line.substr(colon + 1);
@@ -429,6 +436,7 @@ void Engine::process_network()
         case char2int("reload"):
         {
             map.clear();
+            gui.clear();
             network.queueLoadSequence();
             break;
         }
