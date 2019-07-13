@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include <TGUI/SignalImpl.hpp>
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 
@@ -51,7 +52,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 
 Engine::Engine()
 {
-    setup_window(false);
+    setup_window(true);
     network.login();
     network.queueLoadSequence();
 }
@@ -101,9 +102,9 @@ void Engine::setup_window(bool fullscreen)
     gui.tgui.setTarget(window);
 }
 
-void Engine::load_gui_data()
+void Engine::setup_gui()
 {
-    if(gui.isDataLoaded())
+    if(gui.isSetupCompleted())
         return;
 
     gui.set_screen_size(window.getSize());
@@ -114,12 +115,21 @@ void Engine::load_gui_data()
     gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
     resource_manager.load_graphic("equip.png", Graphic::INTERFACE);
 
+    gui.editbox->connect("Focused", [&]{keyboard.block = true;});
+    gui.editbox->connect("Unfocused", [&]{keyboard.block = false;});
+    gui.editbox->connect("ReturnKeyPressed", &Engine::sendMessage, this);
+
     sf::Vector2u screen_size = gui.leftoverScreenSize();
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
 
-    gui.setupTGUI();
-    gui.dataLoadCompleted();
+    gui.setupCompleted();
+}
+
+void Engine::sendMessage(const std::string& value)
+{
+    gui.editbox->setText(sf::String());
+    network.queueMessage(value);
 }
 
 void Engine::process_input()
@@ -258,7 +268,7 @@ void Engine::process_network()
             //p[18] is hero base intelligence
             //p[19] is hero profession name
             resource_manager.set_mpath(p[11]);
-            load_gui_data();//we need mpath
+            setup_gui();//we need mpath
 
             resource_manager.load_graphic(p[10], Graphic::HERO);
             hero.set_texture(resource_manager.get_texture(p[10]));

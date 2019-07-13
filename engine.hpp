@@ -29,8 +29,8 @@ private:
     bool run_game();
     bool run_network();
     void setup_window(bool fullscreen);
-    void load_gui_data();
-
+    void setup_gui();
+    void sendMessage(const std::string& value);
 
     void process_input();
     void game_logic();

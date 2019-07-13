@@ -1,27 +1,32 @@
 #include "gui.hpp"
 
-void Gui::setupTGUI()
+//792x544 oldmargonem window size
+Gui::Gui()
 {
-    //792x544
-    //540x270
-    //228x190
+    //228x190 oldmargonem chatbox size
     chatbox = tgui::ChatBox::create();
-	chatbox->setPosition(sf::Vector2f(screen_size.x-(792-540), 270));
+    chatbox->setTextSize(10);
     chatbox->setSize(sf::Vector2f(228, 190));
     chatbox->setTextColor(tgui::Color::White);
-    chatbox->setTextSize(10);
     chatbox->getSharedRenderer()->setBackgroundColor(tgui::Color::Transparent);
     tgui.add(chatbox);
+
+    //235x18 oldmargonem textbox size
+    editbox = tgui::EditBox::create();
+    editbox->setTextSize(10);
+    editbox->setSize(sf::Vector2f(235, 18));
+    //editbox->getSharedRenderer()->setBackgroundColor(tgui::Color::Transparent);
+    tgui.add(editbox);
 }
 
-bool Gui::isDataLoaded() const
+bool Gui::isSetupCompleted() const
 {
-    return dataLoaded;
+    return setup_state;
 }
 
-void Gui::dataLoadCompleted()
+void Gui::setupCompleted()
 {
-    dataLoaded = true;
+    setup_state = true;
 }
 
 void Gui::showLoadScreen()
@@ -36,6 +41,11 @@ void Gui::hideLoadScreen()
 
 void Gui::set_screen_size(sf::Vector2u value)
 {
+    //540x270 oldmargonem chatbox position
+    chatbox->setPosition(sf::Vector2f(value.x-(792-540), 270));
+    //535x490 oldmargonem textbox position
+    editbox->setPosition(sf::Vector2f(value.x-(792-535), 490));
+
     screen_size = value;
 }
 
@@ -79,7 +89,6 @@ void Gui::clear()
 {
     chatbox->removeAllLines();
 }
-
 
 void Gui::draw(sf::RenderWindow& window)
 {

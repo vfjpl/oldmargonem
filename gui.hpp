@@ -3,26 +3,29 @@
 
 #include <TGUI/Gui.hpp>
 #include <TGUI/Widgets/ChatBox.hpp>
+#include <TGUI/Widgets/EditBox.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
 class Gui
 {
 public:
     tgui::Gui tgui;
+    tgui::ChatBox::Ptr chatbox;
+    tgui::EditBox::Ptr editbox;
 
 private:
     sf::Sprite right_panel_sprite;
     sf::Sprite loading_sprite;
-    tgui::ChatBox::Ptr chatbox;
     sf::Vector2u screen_size;
     sf::Vector2u leftover_size;
     bool show_load_screen = false;
-    bool dataLoaded = false;
+    bool setup_state = false;
 
 public:
-    void setupTGUI();
-    bool isDataLoaded() const;
-    void dataLoadCompleted();
+    Gui();
+    bool isSetupCompleted() const;
+    void setupCompleted();
+
     void showLoadScreen();
     void hideLoadScreen();
 

@@ -120,6 +120,11 @@ void Network::queueFight(const std::string& value)
     fifo.emplace("auto=1&attack=" + value  + "&task=fight");
 }
 
+void Network::queueMessage(const std::string& value)
+{
+
+}
+
 void Network::queueLoadSequence()
 {
     fifo.emplace("initlvl=1&build=1007&task=init");

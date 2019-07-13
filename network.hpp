@@ -35,6 +35,7 @@ public:
     void queueMove(sf::Vector2i value);
     void queueEnter();
     void queueFight(const std::string& value);
+    void queueMessage(const std::string& value);
     void queueLoadSequence();
 
     void sendRequest();
