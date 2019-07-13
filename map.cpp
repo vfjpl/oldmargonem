@@ -72,7 +72,7 @@ void Map::draw(sf::RenderWindow& window, float move_fraction)
     mutex.unlock();
 }
 
-std::string Map::findclose() const
+unsigned long Map::findclose() const
 {
     for(auto &i : NPCs)
     {
@@ -81,5 +81,5 @@ std::string Map::findclose() const
             if(temp.y >= -1 && temp.y <= 1)
                 return i.first;
     }
-    return std::string();
+    return -1;
 }

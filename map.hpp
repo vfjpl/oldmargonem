@@ -10,9 +10,9 @@
 class Map
 {
 public:
-    std::map<std::string, Item> items;
-    std::map<std::string, NPC> NPCs;
-    std::map<std::string, Other> players;
+    std::map<unsigned long, Item> items;
+    std::map<unsigned long, NPC> NPCs;
+    std::map<unsigned long, Other> players;
 
 private:
     sf::Sprite map_sprite;
@@ -40,7 +40,7 @@ public:
     void clear();
     void draw(sf::RenderWindow& window, float move_fraction);
 
-    std::string findclose() const;
+    unsigned long findclose() const;
 };
 
 #endif // MAP_HPP_INCLUDED

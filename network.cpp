@@ -64,7 +64,7 @@ void Network::set_bseq(const std::string& value)
     bseq = value;
 }
 
-void Network::set_pdir(const std::string& value)
+void Network::set_pdir(char value)
 {
     pdir = value;
 }
@@ -115,14 +115,17 @@ void Network::queueEnter()
     fifo.emplace("task=walk");
 }
 
-void Network::queueFight(const std::string& value)
+void Network::queueFight(unsigned long id)
 {
-    fifo.emplace("auto=1&attack=" + value  + "&task=fight");
+    if(id == -1)
+        return;
+    fifo.emplace("auto=1&attack=" + std::to_string(id)  + "&task=fight");
 }
 
 void Network::queueMessage(const std::string& value)
 {
-
+    //TODO: proper handling
+    fifo.emplace("tekst=" + value + "&task=chat");
 }
 
 void Network::queueLoadSequence()

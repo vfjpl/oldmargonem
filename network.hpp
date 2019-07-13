@@ -26,15 +26,14 @@ public:
     void set_lastch(const std::string& value);
     void set_lastcch(const std::string& value);
     void set_bseq(const std::string& value);
-    //string because we get dir from network as string
-    void set_pdir(const std::string& value);
+    void set_pdir(char value);
 
     //logs in and sets necessary cookies
     void login(const std::string& login, const std::string& password);
 
     void queueMove(sf::Vector2i value);
     void queueEnter();
-    void queueFight(const std::string& value);
+    void queueFight(unsigned long id);
     void queueMessage(const std::string& value);
     void queueLoadSequence();
 

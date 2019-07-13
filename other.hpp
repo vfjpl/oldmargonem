@@ -15,8 +15,7 @@ class Other
 public:
     void set_position(sf::Vector2i value);
     void set_texture(const sf::Texture& texture);
-    //string because we get dir from network as string
-    void set_dir(const std::string& value);
+    void set_dir(char value);
 
     void draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size);
 };

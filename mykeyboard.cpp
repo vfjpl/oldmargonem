@@ -5,7 +5,7 @@ bool MyKeyboard::anyKey() const
     if(block)
         return false;
 
-    switch(dir.front())
+    switch(dir)
     {
     case '0':
         return keys[0];

@@ -30,7 +30,6 @@ private:
     bool run_network();
     void setup_window(bool fullscreen);
     void setup_gui();
-    void sendMessage(const std::string& value);
 
     void process_input();
     void game_logic();

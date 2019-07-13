@@ -16,9 +16,9 @@ void Other::set_texture(const sf::Texture& texture)
     p_correction = p_per_tile/2.f;
 }
 
-void Other::set_dir(const std::string& value)
+void Other::set_dir(char value)
 {
-    sprite_rect.top = (value.front() - '0') * p_per_tile.y;
+    sprite_rect.top = (value - '0') * p_per_tile.y;
     other_sprite.setTextureRect(sprite_rect);
 }
 

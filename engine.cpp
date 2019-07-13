@@ -115,21 +115,15 @@ void Engine::setup_gui()
     gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
     resource_manager.load_graphic("equip.png", Graphic::INTERFACE);
 
-    gui.editbox->connect("Focused", [&]{keyboard.block = true;});
-    gui.editbox->connect("Unfocused", [&]{keyboard.block = false;});
-    gui.editbox->connect("ReturnKeyPressed", &Engine::sendMessage, this);
+    gui.editbox->connect("Focused", [&] {keyboard.block = true;});
+    gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
+    gui.editbox->connect("ReturnKeyPressed", &Network::queueMessage, &network);
 
     sf::Vector2u screen_size = gui.leftoverScreenSize();
     map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
 
     gui.setupCompleted();
-}
-
-void Engine::sendMessage(const std::string& value)
-{
-    gui.editbox->setText(sf::String());
-    network.queueMessage(value);
 }
 
 void Engine::process_input()
@@ -161,10 +155,12 @@ void Engine::process_input()
                 keyboard.keys[2] = true;
                 break;
             case sf::Keyboard::F:
-                network.queueFight(map.findclose());
+                if(!keyboard.block)
+                    network.queueFight(map.findclose());
                 break;
             case sf::Keyboard::E:
-                network.queueEnter();
+                if(!keyboard.block)
+                    network.queueEnter();
                 break;
             case sf::Keyboard::Escape:
                 window.close();
@@ -213,7 +209,7 @@ void Engine::game_logic()
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
         network.set_pdir(keyboard.dir);
-        hero.move(keyboard.dir.front());
+        hero.move(keyboard.dir);
 
         sf::Vector2i pos = hero.getPosition();
         map.center(pos);
@@ -272,11 +268,13 @@ void Engine::process_network()
 
             resource_manager.load_graphic(p[10], Graphic::HERO);
             hero.set_texture(resource_manager.get_texture(p[10]));
+
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
+            char dir = p[2].front();
             hero.set_pos(pos);
-            hero.set_dir(p[2]);
+            hero.set_dir(dir);
             map.center(pos);
-            network.set_pdir(p[2]);
+            network.set_pdir(dir);
             break;
         }
         case char2int("town")://FINISHED
@@ -303,10 +301,11 @@ void Engine::process_network()
             //p[0-1] is hero pos
             //p[2] is hero dir
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
+            char dir = p[2].front();
             hero.set_pos(pos);
-            hero.set_dir(p[2]);
+            hero.set_dir(dir);
             map.center(pos);
-            network.set_pdir(p[2]);
+            network.set_pdir(dir);
             break;
         }
         case char2int("element"):
@@ -315,6 +314,7 @@ void Engine::process_network()
             std::vector<std::string> p = split2(parm, '=', ';');
 
             //p[0] element type
+            unsigned long id = std::stoul(p[1]);
             //p[1] is item id
             switch(str2int(p[0]))
             {
@@ -323,8 +323,8 @@ void Engine::process_network()
                 //p[3-4] is item position
                 //p[5] is item graphic
                 resource_manager.load_graphic(p[5], Graphic::ITEM);
-                map.items[p[1]].set_texture(resource_manager.get_texture(p[5]));
-                map.items[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.items[id].set_texture(resource_manager.get_texture(p[5]));
+                map.items[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 break;
             case char2int("npc"):
                 //p[2] is npc nick
@@ -336,8 +336,8 @@ void Engine::process_network()
                 //p[9] is npc group fight
                 //p[10] is npc questmark
                 resource_manager.load_graphic(p[5], Graphic::NPC);
-                map.NPCs[p[1]].set_texture(resource_manager.get_texture(p[5]));
-                map.NPCs[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.NPCs[id].set_texture(resource_manager.get_texture(p[5]));
+                map.NPCs[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 break;
             case char2int("other"):
                 //p[2] is other nick
@@ -349,9 +349,9 @@ void Engine::process_network()
                 //p[9] is other level
                 //p[10] is other clan tag
                 resource_manager.load_graphic(p[7], Graphic::HERO);
-                map.players[p[1]].set_texture(resource_manager.get_texture(p[7]));
-                map.players[p[1]].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
-                map.players[p[1]].set_dir(p[6]);
+                map.players[id].set_texture(resource_manager.get_texture(p[7]));
+                map.players[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.players[id].set_dir(p[6].front());
                 break;
             default:
                 std::cout << cmd << ' ' << p[0] << " NOT IMPLEMENTED\n";
@@ -366,14 +366,15 @@ void Engine::process_network()
             std::vector<std::string> p2 = split2(p1[1], '=', ';');
 
             //p1[0] is id
+            unsigned long id = std::stoul(p1[0]);
             //p2[0] is event
             switch(str2int(p2[0]))
             {
             case char2int("move"):
                 //p2[1-2] is id position
                 //p2[3] is id direction
-                map.players[p1[0]].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
-                map.players[p1[0]].set_dir(p2[3]);
+                map.players[id].set_position(sf::Vector2i(std::stoi(p2[1]), std::stoi(p2[2])));
+                map.players[id].set_dir(p2[3].front());
                 break;
             default:
                 std::cout << cmd << ' ' << p2[0] << " NOT IMPLEMENTED\n";
@@ -387,17 +388,18 @@ void Engine::process_network()
             std::vector<std::string> p = split(parm, ',');
 
             //p[0] is id
+            unsigned long id = std::stoul(p[0]);
             //p[1] is type
             switch(str2int(p[1]))
             {
             case char2int("item"):
-                map.items.erase(p[0]);
+                map.items.erase(id);
                 break;
             case char2int("npc"):
-                map.NPCs.erase(p[0]);
+                map.NPCs.erase(id);
                 break;
             case char2int("other"):
-                map.players.erase(p[0]);
+                map.players.erase(id);
                 break;
             default:
                 std::cout << cmd << ' ' << p[1] << " NOT IMPLEMENTED\n";
