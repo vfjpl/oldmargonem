@@ -4,10 +4,13 @@
 int main()
 {
     Engine engine;
-    sf::Thread thread(&Engine::networkThreadFunc, &engine);
+    sf::Thread thread([&]
+    {
+        while(engine.run_network());
+    });
 
     thread.launch();
-    engine.gameThreadFunc();
+    while(engine.run_game());
 
     return EXIT_SUCCESS;
 }

@@ -52,19 +52,18 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 
 Engine::Engine()
 {
+    gui.editbox->connect("Focused", [&] {keyboard.block = true;});
+    gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
+    gui.editbox->connect("ReturnKeyPressed", [&](const std::string& msg)
+    {
+        gui.editbox->setText(std::string());
+        network.queueMessage(msg);
+    });
+
+    //temp
     setup_window(true);
     network.login();
     network.queueLoadSequence();
-}
-
-void Engine::gameThreadFunc()
-{
-    while(run_game());
-}
-
-void Engine::networkThreadFunc()
-{
-    while(run_network());
 }
 
 bool Engine::run_game()
@@ -100,6 +99,7 @@ void Engine::setup_window(bool fullscreen)
     window.setKeyRepeatEnabled(false);
     window.clear();
     gui.tgui.setTarget(window);
+    gui.set_screen_size(window.getSize());
 }
 
 void Engine::setup_gui()
@@ -107,21 +107,12 @@ void Engine::setup_gui()
     if(gui.isSetupCompleted())
         return;
 
-    gui.set_screen_size(window.getSize());
-
-    resource_manager.load_graphic("loading.png", Graphic::GAME);
-    gui.set_loading_texture(resource_manager.get_texture("loading.png"));
     resource_manager.load_graphic("panel.png", Graphic::INTERFACE);
     gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
-    resource_manager.load_graphic("equip.png", Graphic::INTERFACE);
-
-    gui.editbox->connect("Focused", [&] {keyboard.block = true;});
-    gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
-    gui.editbox->connect("ReturnKeyPressed", &Network::queueMessage, &network);
 
     sf::Vector2u screen_size = gui.leftoverScreenSize();
-    map.set_screen_size(screen_size);
     hero.set_screen_size(screen_size);
+    map.set_screen_size(screen_size);
 
     gui.setupCompleted();
 }
@@ -407,12 +398,6 @@ void Engine::process_network()
             }// end switch
             break;
         }
-        case char2int("chat"):
-        {
-            std::string parm = line.substr(colon + 1);
-            gui.addChatMessage(parm);
-            break;
-        }
         case char2int("battlemsg"):
         {
             std::string parm = line.substr(colon + 1);
@@ -425,6 +410,12 @@ void Engine::process_network()
         {
             std::string parm = line.substr(colon + 1);
             resource_manager.load_graphic(parm, Graphic::BATTLEPLACE);
+            break;
+        }
+        case char2int("chat")://FINISHED
+        {
+            std::string parm = line.substr(colon + 1);
+            gui.addChatMessage(parm);
             break;
         }
         case char2int("maxchat")://FINISHED
@@ -448,7 +439,7 @@ void Engine::process_network()
         case char2int("reload"):
         {
             map.clear();
-            gui.clear();
+            gui.chatbox->removeAllLines();
             network.queueLoadSequence();
             break;
         }

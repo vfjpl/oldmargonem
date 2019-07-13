@@ -81,5 +81,5 @@ unsigned long Map::findclose() const
             if(temp.y >= -1 && temp.y <= 1)
                 return i.first;
     }
-    return -1;
+    return -1ul;
 }

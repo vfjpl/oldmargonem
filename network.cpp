@@ -117,7 +117,7 @@ void Network::queueEnter()
 
 void Network::queueFight(unsigned long id)
 {
-    if(id == -1)
+    if(id == -1ul)
         return;
     fifo.emplace("auto=1&attack=" + std::to_string(id)  + "&task=fight");
 }

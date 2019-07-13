@@ -22,12 +22,10 @@ class Engine
 
 public:
     Engine();
-    void gameThreadFunc();
-    void networkThreadFunc();
-
-private:
     bool run_game();
     bool run_network();
+
+private:
     void setup_window(bool fullscreen);
     void setup_gui();
 
