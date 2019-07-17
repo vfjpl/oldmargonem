@@ -230,17 +230,17 @@ void Engine::process_network()
             //p[0-1] is hero pos
             //p[2] is hero direction
             //p[3] is hero nick
-            //p[4] is
+            //p[4] is group
             //p[5] is hero level
             //p[6] is hero exp
-            //p[7] is
+            //p[7] is abilitypoints
             //p[8] is hero gold
-            //p[9] is
+            //p[9] is draconite
             //p[10] is hero graphic
             //p[11] is mpath
-            //p[12] is
-            //p[13] is
-            //p[14] is
+            //p[12] is guild
+            //p[13] is pvp
+            //p[14] is options
             //p[15] is hero profession shortcut
             //p[16] is hero base strength
             //p[17] is hero base agility
