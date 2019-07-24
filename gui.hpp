@@ -15,21 +15,15 @@ public:
 
 private:
     sf::Sprite right_panel_sprite;
-    sf::Vector2u screen_size;
-    sf::Vector2u leftover_size;
-    bool setup_state = false;
+    sf::Vector2u usable_screen_size;
+    sf::Vector2u interface_size;
 
 public:
     Gui();
-    bool isSetupCompleted() const;
-    void setupCompleted();
-
     void set_screen_size(sf::Vector2u value);
-    sf::Vector2u leftoverScreenSize() const;
+    sf::Vector2u usableScreenSize() const;
 
     void set_right_pannel_texture(const sf::Texture& texture);
-
-    void addChatMessage(const std::string& msg);
 
     void draw(sf::RenderWindow& window);
 };

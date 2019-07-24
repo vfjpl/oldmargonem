@@ -26,45 +26,30 @@ Gui::Gui()
     tgui.add(editbox);
 }
 
-bool Gui::isSetupCompleted() const
-{
-    return setup_state;
-}
-
-void Gui::setupCompleted()
-{
-    setup_state = true;
-}
-
 void Gui::set_screen_size(sf::Vector2u value)
 {
+    usable_screen_size.x = value.x - interface_size.x;
+    usable_screen_size.y = value.y;
+
+    sf::Vector2f offset;
+    offset.x = usable_screen_size.x;
+    right_panel_sprite.setPosition(offset);
+
     //540x270 oldmargonem chatbox position
     chatbox->setPosition(sf::Vector2f(value.x-(792-540), 270));
     //535x490 oldmargonem textbox position
     editbox->setPosition(sf::Vector2f(value.x-(792-535), 490));
-
-    screen_size = value;
-    leftover_size = value;
 }
 
-sf::Vector2u Gui::leftoverScreenSize() const
+sf::Vector2u Gui::usableScreenSize() const
 {
-    return leftover_size;
+    return usable_screen_size;
 }
 
 void Gui::set_right_pannel_texture(const sf::Texture& texture)
 {
     right_panel_sprite.setTexture(texture);
-    leftover_size.x -= texture.getSize().x;
-
-    sf::Vector2f offset;
-    offset.x = leftover_size.x;
-    right_panel_sprite.setPosition(offset);
-}
-
-void Gui::addChatMessage(const std::string& msg)
-{
-    chatbox->addLine(msg);
+    interface_size = texture.getSize();
 }
 
 void Gui::draw(sf::RenderWindow& window)

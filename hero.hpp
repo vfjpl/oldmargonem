@@ -8,7 +8,6 @@ class Hero
 {
     sf::Sprite hero_sprite;
     sf::IntRect sprite_rect;
-    sf::Vector2f screen_center;
     sf::Vector2f p_per_tile;
     sf::Vector2f p_correction;
     sf::Vector2i hero_pos;

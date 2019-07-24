@@ -99,22 +99,19 @@ void Engine::setup_window(bool fullscreen)
     window.setKeyRepeatEnabled(false);
     window.clear();
     gui.tgui.setTarget(window);
-    gui.set_screen_size(window.getSize());
 }
 
 void Engine::setup_gui()
 {
-    if(gui.isSetupCompleted())
-        return;
 
-    resource_manager.load_graphic("panel.png", Graphic::INTERFACE);
-    gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
+}
 
-    sf::Vector2u screen_size = gui.leftoverScreenSize();
-    hero.set_screen_size(screen_size);
-    map.set_screen_size(screen_size);
-
-    gui.setupCompleted();
+void Engine::resize_window(sf::Vector2u screen_size)
+{
+    gui.set_screen_size(screen_size);
+    sf::Vector2u usable_size = gui.usableScreenSize();
+    hero.set_screen_size(usable_size);
+    map.set_screen_size(usable_size);
 }
 
 void Engine::process_input()
@@ -127,38 +124,37 @@ void Engine::process_input()
         {
         case sf::Event::KeyPressed:
         {
-            switch(event.key.code)
-            {
-            case sf::Keyboard::W:
-                keyboard.dir = '3';
-                keyboard.keys[3] = true;
-                break;
-            case sf::Keyboard::A:
-                keyboard.dir = '1';
-                keyboard.keys[1] = true;
-                break;
-            case sf::Keyboard::S:
-                keyboard.dir = '0';
-                keyboard.keys[0] = true;
-                break;
-            case sf::Keyboard::D:
-                keyboard.dir = '2';
-                keyboard.keys[2] = true;
-                break;
-            case sf::Keyboard::F:
-                if(!keyboard.block)
+            if(!keyboard.block)
+                switch(event.key.code)
+                {
+                case sf::Keyboard::W:
+                    keyboard.dir = '3';
+                    keyboard.keys[3] = true;
+                    break;
+                case sf::Keyboard::A:
+                    keyboard.dir = '1';
+                    keyboard.keys[1] = true;
+                    break;
+                case sf::Keyboard::S:
+                    keyboard.dir = '0';
+                    keyboard.keys[0] = true;
+                    break;
+                case sf::Keyboard::D:
+                    keyboard.dir = '2';
+                    keyboard.keys[2] = true;
+                    break;
+                case sf::Keyboard::F:
                     network.queueFight(map.findclose());
-                break;
-            case sf::Keyboard::E:
-                if(!keyboard.block)
+                    break;
+                case sf::Keyboard::E:
                     network.queueEnter();
-                break;
-            case sf::Keyboard::Escape:
-                window.close();
-                break;
-            default:
-                break;
-            }// end switch
+                    break;
+                case sf::Keyboard::Escape:
+                    window.close();
+                    break;
+                default:
+                    break;
+                }// end switch
             break;
         }
         case sf::Event::KeyReleased:
@@ -200,6 +196,7 @@ void Engine::game_logic()
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
         network.set_pdir(keyboard.dir);
+        hero.set_dir(keyboard.dir);
         hero.move(keyboard.dir);
 
         sf::Vector2i pos = hero.getPosition();
@@ -255,10 +252,15 @@ void Engine::process_network()
             //p[18] is hero base intelligence
             //p[19] is hero profession name
             resource_manager.set_mpath(p[11]);
-            setup_gui();//we need mpath
 
+            //temp
+            resource_manager.load_graphic("panel.png", Graphic::INTERFACE);
             resource_manager.load_graphic(p[10], Graphic::HERO);
             hero.set_texture(resource_manager.get_texture(p[10]));
+            gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
+
+            setup_gui();//we need mpath
+            resize_window(window.getSize());//we need textures for size
 
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
             char dir = p[2].front();
@@ -304,9 +306,9 @@ void Engine::process_network()
             std::string parm = line.substr(colon + 1);
             std::vector<std::string> p = split2(parm, '=', ';');
 
-            //p[0] element type
+            //p[1] is element id
             unsigned long id = std::stoul(p[1]);
-            //p[1] is item id
+            //p[0] element type
             switch(str2int(p[0]))
             {
             case char2int("item"):
@@ -314,8 +316,8 @@ void Engine::process_network()
                 //p[3-4] is item position
                 //p[5] is item graphic
                 resource_manager.load_graphic(p[5], Graphic::ITEM);
-                map.items[id].set_texture(resource_manager.get_texture(p[5]));
                 map.items[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.items[id].set_texture(resource_manager.get_texture(p[5]));
                 break;
             case char2int("npc"):
                 //p[2] is npc nick
@@ -327,8 +329,8 @@ void Engine::process_network()
                 //p[9] is npc group fight
                 //p[10] is npc questmark
                 resource_manager.load_graphic(p[5], Graphic::NPC);
-                map.NPCs[id].set_texture(resource_manager.get_texture(p[5]));
                 map.NPCs[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.NPCs[id].set_texture(resource_manager.get_texture(p[5]));
                 break;
             case char2int("other"):
                 //p[2] is other nick
@@ -340,8 +342,8 @@ void Engine::process_network()
                 //p[9] is other level
                 //p[10] is other clan tag
                 resource_manager.load_graphic(p[7], Graphic::HERO);
-                map.players[id].set_texture(resource_manager.get_texture(p[7]));
                 map.players[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
+                map.players[id].set_texture(resource_manager.get_texture(p[7]));
                 map.players[id].set_dir(p[6].front());
                 break;
             default:
@@ -415,7 +417,7 @@ void Engine::process_network()
         case char2int("chat")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
-            gui.addChatMessage(parm);
+            gui.chatbox->addLine(parm);
             break;
         }
         case char2int("maxchat")://FINISHED
@@ -436,7 +438,7 @@ void Engine::process_network()
             network.set_ev(parm);
             break;
         }
-        case char2int("reload"):
+        case char2int("reload")://FINISHED
         {
             map.clear();
             gui.chatbox->removeAllLines();

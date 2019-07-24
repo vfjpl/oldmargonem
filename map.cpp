@@ -1,6 +1,7 @@
 #include "map.hpp"
 #include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
+#include <climits>
 
 void Map::set_map_size(sf::Vector2u value)
 {
@@ -81,5 +82,5 @@ unsigned long Map::findclose() const
             if(temp.y >= -1 && temp.y <= 1)
                 return i.first;
     }
-    return -1ul;
+    return ULONG_MAX;
 }
