@@ -5,6 +5,7 @@
 #include <Poco/Net/NameValueCollection.h>
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPCookie.h>
+#include <Poco/URI.h>
 #include <sys/time.h>
 #include <sstream>
 
@@ -122,10 +123,9 @@ void Network::queueFight(unsigned long id)
     fifo.emplace("auto=1&attack=" + std::to_string(id)  + "&task=fight");
 }
 
-void Network::queueMessage(const std::string& value)
+void Network::queueMessage(const char* value)
 {
-    //TODO: proper handling
-    fifo.emplace("tekst=" + value + "&task=chat");
+    fifo.emplace("tekst=" + Poco::URI(value).toString() + "&task=chat");
 }
 
 void Network::queueLoadSequence()

@@ -34,7 +34,7 @@ public:
     void queueMove(sf::Vector2i value);
     void queueEnter();
     void queueFight(unsigned long id);
-    void queueMessage(const std::string& value);
+    void queueMessage(const char* value);
     void queueLoadSequence();
 
     void sendRequest();

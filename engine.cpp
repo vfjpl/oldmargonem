@@ -54,10 +54,10 @@ Engine::Engine()
 {
     gui.editbox->connect("Focused", [&] {keyboard.block = true;});
     gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
-    gui.editbox->connect("ReturnKeyPressed", [&](const std::string& msg)
+    gui.editbox->connect("ReturnKeyPressed", [&](const sf::String& msg)
     {
-        gui.editbox->setText(std::string());
-        network.queueMessage(msg);
+        network.queueMessage((char*)msg.toUtf8().data());
+        gui.editbox->setText(sf::String());
     });
 
     //temp
@@ -419,6 +419,11 @@ void Engine::process_network()
             std::string parm = line.substr(colon + 1);
             gui.chatbox->addLine(parm);
             break;
+        }
+        case char2int("alert"):
+        {
+            std::string parm = line.substr(colon +1);
+            gui.chatbox->addLine(parm);
         }
         case char2int("maxchat")://FINISHED
         {
