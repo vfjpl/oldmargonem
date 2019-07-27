@@ -1,4 +1,5 @@
 #include "hero.hpp"
+#include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
 void Hero::set_screen_size(sf::Vector2u value)
@@ -24,7 +25,6 @@ void Hero::set_texture(const sf::Texture& texture)
 void Hero::set_dir(char value)
 {
     sprite_rect.top = (value - '0') * p_per_tile.y;
-    hero_sprite.setTextureRect(sprite_rect);
 }
 
 void Hero::move(char dir)
@@ -44,6 +44,8 @@ void Hero::move(char dir)
         --hero_pos.y;
         break;
     }// end switch
+    sprite_rect.top = (dir - '0') * p_per_tile.y;
+    sprite_rect.left = ((++steps)%4) * p_per_tile.x;
 }
 
 sf::Vector2i Hero::getPosition() const
@@ -51,7 +53,10 @@ sf::Vector2i Hero::getPosition() const
     return hero_pos;
 }
 
-void Hero::draw(sf::RenderWindow& window)
+void Hero::draw(sf::RenderWindow& window, float moveTime)
 {
+    if(moveTime > 1/MOVEMENT_SPEED)
+        sprite_rect.left = 0;
+    hero_sprite.setTextureRect(sprite_rect);
     window.draw(hero_sprite);
 }

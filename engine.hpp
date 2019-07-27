@@ -28,7 +28,6 @@ public:
 private:
     void setup_window(bool fullscreen);
     void resize_window(sf::Vector2u screen_size);
-    void setup_gui();
 
     void process_input();
     void game_logic();

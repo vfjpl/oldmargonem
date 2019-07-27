@@ -1,11 +1,11 @@
 #include "network.hpp"
 #include "config.hpp"
+#include <Poco/URI.h>
 #include <Poco/SHA1Engine.h>
 #include <Poco/Net/HTMLForm.h>
 #include <Poco/Net/NameValueCollection.h>
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPCookie.h>
-#include <Poco/URI.h>
 #include <sys/time.h>
 #include <sstream>
 

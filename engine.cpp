@@ -101,11 +101,6 @@ void Engine::setup_window(bool fullscreen)
     gui.tgui.setTarget(window);
 }
 
-void Engine::setup_gui()
-{
-
-}
-
 void Engine::resize_window(sf::Vector2u screen_size)
 {
     gui.set_screen_size(screen_size);
@@ -196,7 +191,6 @@ void Engine::game_logic()
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
         network.set_pdir(keyboard.dir);
-        hero.set_dir(keyboard.dir);
         hero.move(keyboard.dir);
 
         sf::Vector2i pos = hero.getPosition();
@@ -208,8 +202,9 @@ void Engine::game_logic()
 
 void Engine::draw_frame()
 {
-    map.draw(window, clock.getMoveTime());
-    hero.draw(window);
+    float mt = clock.getMoveTime();
+    map.draw(window, mt);
+    hero.draw(window, mt);
     gui.draw(window);
     window.display();
 }
@@ -253,13 +248,11 @@ void Engine::process_network()
             //p[19] is hero profession name
             resource_manager.set_mpath(p[11]);
 
-            //temp
+            //load gui
             resource_manager.load_graphic("panel.png", Graphic::INTERFACE);
             resource_manager.load_graphic(p[10], Graphic::HERO);
-            hero.set_texture(resource_manager.get_texture(p[10]));
             gui.set_right_pannel_texture(resource_manager.get_texture("panel.png"));
-
-            setup_gui();//we need mpath
+            hero.set_texture(resource_manager.get_texture(p[10]));
             resize_window(window.getSize());//we need textures for size
 
             sf::Vector2i pos(std::stoi(p[0]), std::stoi(p[1]));
@@ -420,10 +413,17 @@ void Engine::process_network()
             gui.chatbox->addLine(parm);
             break;
         }
-        case char2int("alert"):
+        case char2int("alert")://FINISHED
         {
             std::string parm = line.substr(colon +1);
             gui.chatbox->addLine(parm);
+            break;
+        }
+        case char2int("msg")://FINISHED
+        {
+            std::string parm = line.substr(colon +1);
+            gui.chatbox->addLine(parm);
+            break;
         }
         case char2int("maxchat")://FINISHED
         {
