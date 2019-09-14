@@ -24,10 +24,12 @@ class Resource_Manager
 public:
     //set download server address for graphics
     void set_mpath(const std::string& value);
+
     //give you texture that you can use with sprites
     const sf::Texture& get_texture(const std::string& name) const;
-    //download graphic with given name and type(safe to call multiple times with the same name)
-    void load_graphic(const std::string& name, Graphic what);
+
+    //download graphic with given name and type
+    void load_graphic(const std::string& name, Graphic type);
 };
 
 #endif // RESOURCE_MANAGER_HPP_INCLUDED

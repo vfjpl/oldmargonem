@@ -11,13 +11,13 @@ const sf::Texture& Resource_Manager::get_texture(const std::string& name) const
     return storage.at(name);
 }
 
-void Resource_Manager::load_graphic(const std::string& name, Graphic what)
+void Resource_Manager::load_graphic(const std::string& name, Graphic type)
 {
     if(storage.count(name))
         return;
 
     std::string path;
-    switch(what)
+    switch(type)
     {
     case GAME:
         path = "/obrazki/game/";
