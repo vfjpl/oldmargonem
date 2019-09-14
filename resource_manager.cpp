@@ -70,12 +70,9 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic what)
         sf::Vector2u resized_size = resized.getSize();
 
         for(unsigned int y = 0; y < resized_size.y; ++y)
-        {
             for(unsigned int x = 0; x < resized_size.x; ++x)
-            {
                 resized.setPixel(x, y, orginal.getPixel(x * scale, y * scale));
-            }
-        }
+
         storage[name].loadFromImage(resized);
     }
 }
