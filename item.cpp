@@ -14,6 +14,6 @@ void Item::set_texture(const sf::Texture& texture)
 
 void Item::draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size)
 {
-    item_sprite.setPosition((sf::Vector2f(item_pos) * map_tile_size) - p_correction - map_offset);
+    item_sprite.setPosition((sf::Vector2f(item_pos) * map_tile_size) - map_offset - p_correction);
     window.draw(item_sprite);
 }

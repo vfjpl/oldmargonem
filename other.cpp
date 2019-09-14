@@ -16,14 +16,14 @@ void Other::set_texture(const sf::Texture& texture)
     p_correction = p_per_tile/2.f;
 }
 
+void Other::draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size)
+{
+    other_sprite.setPosition((sf::Vector2f(other_pos) * map_tile_size) - map_offset - p_correction);
+    window.draw(other_sprite);
+}
+
 void Other::set_dir(char value)
 {
     sprite_rect.top = (value - '0') * p_per_tile.y;
     other_sprite.setTextureRect(sprite_rect);
-}
-
-void Other::draw(sf::RenderWindow& window, sf::Vector2f map_offset, float map_tile_size)
-{
-    other_sprite.setPosition((sf::Vector2f(other_pos) * map_tile_size) - p_correction - map_offset);
-    window.draw(other_sprite);
 }
