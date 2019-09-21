@@ -11,7 +11,6 @@ class Hero
     sf::Vector2f p_per_tile;
     sf::Vector2f p_correction;
     sf::Vector2i hero_pos;
-    sf::Uint8 steps;
 
 public:
     void set_screen_size(sf::Vector2u value);
@@ -22,7 +21,7 @@ public:
     //move in specified direction
     void move(char dir);
     sf::Vector2i getPosition() const;
-    void draw(sf::RenderWindow& window, float moveTime);
+    void draw(sf::RenderWindow& window);
 };
 
 #endif // HERO_HPP_INCLUDED

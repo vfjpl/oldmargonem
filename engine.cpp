@@ -202,9 +202,8 @@ void Engine::game_logic()
 
 void Engine::draw_frame()
 {
-    float mt = clock.getMoveTime();
-    map.draw(window, mt);
-    hero.draw(window, mt);
+    map.draw(window, clock.getMoveTime());
+    hero.draw(window);
     gui.draw(window);
     window.display();
 }
