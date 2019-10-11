@@ -39,8 +39,7 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
     {
         if(old_pos == std::string::npos)
             break;
-        ++old_pos;
-        size_t new_pos = parm.find(second, old_pos);
+        size_t new_pos = parm.find(second, ++old_pos);
         temp.push_back(parm.substr(old_pos, new_pos - old_pos));
         if(new_pos == std::string::npos)
             break;
@@ -119,36 +118,34 @@ void Engine::process_input()
         {
         case sf::Event::KeyPressed:
         {
-            if(!keyboard.block)
-                switch(event.key.code)
-                {
-                case sf::Keyboard::W:
-                    keyboard.dir = '3';
-                    keyboard.keys[3] = true;
-                    break;
-                case sf::Keyboard::A:
-                    keyboard.dir = '1';
-                    keyboard.keys[1] = true;
-                    break;
-                case sf::Keyboard::S:
-                    keyboard.dir = '0';
-                    keyboard.keys[0] = true;
-                    break;
-                case sf::Keyboard::D:
-                    keyboard.dir = '2';
-                    keyboard.keys[2] = true;
-                    break;
-                case sf::Keyboard::F:
-                    break;
-                case sf::Keyboard::E:
-                    network.queueEnter();
-                    break;
-                case sf::Keyboard::Escape:
-                    window.close();
-                    break;
-                default:
-                    break;
-                }// end switch
+            switch(event.key.code)
+            {
+            case sf::Keyboard::W:
+                keyboard.dir = '3';
+                keyboard.keys[3] = true;
+                break;
+            case sf::Keyboard::A:
+                keyboard.dir = '1';
+                keyboard.keys[1] = true;
+                break;
+            case sf::Keyboard::S:
+                keyboard.dir = '0';
+                keyboard.keys[0] = true;
+                break;
+            case sf::Keyboard::D:
+                keyboard.dir = '2';
+                keyboard.keys[2] = true;
+                break;
+            case sf::Keyboard::F:
+                break;
+            case sf::Keyboard::E:
+                break;
+            case sf::Keyboard::Escape:
+                window.close();
+                break;
+            default:
+                break;
+            }// end switch
             break;
         }
         case sf::Event::KeyReleased:
@@ -190,6 +187,7 @@ void Engine::game_logic()
     if(keyboard.anyKey() && clock.moveInterrupt())
     {
         network.set_pdir(keyboard.dir);
+        hero.set_dir(keyboard.dir);
         hero.move(keyboard.dir);
 
         sf::Vector2i pos = hero.getPosition();
