@@ -139,7 +139,6 @@ void Engine::process_input()
                     keyboard.keys[2] = true;
                     break;
                 case sf::Keyboard::F:
-                    network.queueFight(map.findclose());
                     break;
                 case sf::Keyboard::E:
                     network.queueEnter();

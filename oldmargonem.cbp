@@ -30,12 +30,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-std=c++1z" />
 		</Compiler>
 		<Linker>
-			<Add library="tgui" />
 			<Add library="PocoNet" />
 			<Add library="PocoFoundation" />
+			<Add library="tgui" />
 			<Add library="sfml-network" />
 			<Add library="sfml-graphics" />
 			<Add library="sfml-window" />
@@ -66,8 +65,8 @@
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
 		<Extensions>
-			<envvars />
 			<code_completion />
+			<envvars />
 			<debugger />
 		</Extensions>
 	</Project>
