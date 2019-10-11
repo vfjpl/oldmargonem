@@ -1,5 +1,4 @@
 #include "network.hpp"
-#include "config.hpp"
 #include <Poco/URI.h>
 #include <Poco/SHA1Engine.h>
 #include <Poco/Net/HTMLForm.h>
@@ -14,7 +13,7 @@ namespace
 std::string sha1(const std::string& password)
 {
     Poco::SHA1Engine sha1engine;
-    sha1engine.update(PASSHASH + password);
+    sha1engine.update("mleczko" + password);
     return sha1engine.digestToHex(sha1engine.digest());
 }
 std::string getPidValue(const std::string& body)
@@ -40,8 +39,8 @@ std::string toString(std::istream& stream)
 
 Network::Network()
 {
-    session.setHost(GAME_ADDRES);
     session.setKeepAlive(true);
+    session.setHost("game.oldmargonem.pl");
     request.setVersion(Poco::Net::HTTPRequest::HTTP_1_1);
 }
 
@@ -76,7 +75,7 @@ void Network::login(const std::string& login, const std::string& password)
     Poco::Net::HTMLForm login_form;
     login_form.add("l", login);
     login_form.add("ph", sha1(password));
-    Poco::Net::HTTPClientSession login_session(LOGIN_ADDRES);
+    Poco::Net::HTTPClientSession login_session("www.oldmargonem.pl");
     Poco::Net::HTTPRequest login_request(Poco::Net::HTTPRequest::HTTP_POST, "/ajax/logon.php?t=login");
     login_form.prepareSubmit(login_request);
     login_form.write(login_session.sendRequest(login_request));
@@ -95,8 +94,9 @@ void Network::login(const std::string& login, const std::string& password)
 
     //Cookies
     std::vector<Poco::Net::HTTPCookie> cookies_vec;
-    response.getCookies(cookies_vec);
     Poco::Net::NameValueCollection cookies;
+
+    response.getCookies(cookies_vec);
     for(auto &i : cookies_vec)
         cookies.add(i.getName(), i.getValue());
     cookies.add("mchar_id", pid);
@@ -105,10 +105,8 @@ void Network::login(const std::string& login, const std::string& password)
 
 void Network::queueMove(sf::Vector2i value)
 {
-    if(ml.empty())
-        ml = std::to_string(value.x) + ',' + std::to_string(value.y);
-    else
-        ml += ';' + std::to_string(value.x) + ',' + std::to_string(value.y);
+
+    fifo.emplace("dir=" + pdir + "&ml=" + std::to_string(value.x) + ',' + std::to_string(value.y) + "&task=go");
 }
 
 void Network::queueEnter()
@@ -138,24 +136,11 @@ void Network::queueLoadSequence()
 
 void Network::sendRequest()
 {
-    std::string cmd;
-    if(!fifo.empty())
-    {
-        cmd = fifo.front();
-        fifo.pop();
-    }
-    else if(!ml.empty())
-    {
-        cmd = "dir=" + pdir + "&ml=" + ml + "&task=go";
-        ml.clear();
-    }
-    else
-    {
-        cmd = "task=_";
-    }
+    if(fifo.empty())
+        fifo.emplace("task=_");
 
     request.setURI("/db.php?"+
-                   cmd+
+                   fifo.front()+
                    "&pid="+pid+
                    "&ev="+ev+
                    "&lastch="+lastch+
@@ -165,6 +150,7 @@ void Network::sendRequest()
                    "&a="+getTimeString());
 
     session.sendRequest(request);
+    fifo.pop();
 }
 
 std::string Network::receiveResponse()

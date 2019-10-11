@@ -1,7 +1,6 @@
 #include "map.hpp"
 #include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
-#include <climits>
 
 void Map::set_map_size(sf::Vector2u value)
 {
@@ -44,8 +43,6 @@ void Map::clear()
 
 void Map::draw(sf::RenderWindow& window, float move_fraction)
 {
-    mutex.lock();
-
     sf::Vector2f map_offset;
     if(move_fraction < 1/MOVEMENT_SPEED)
     {
@@ -63,6 +60,8 @@ void Map::draw(sf::RenderWindow& window, float move_fraction)
     map_sprite.setTextureRect(sprite_rect);
     window.draw(map_sprite);
 
+    mutex.lock();
+
     for(auto &i : items)
         i.second.draw(window, map_offset, p_per_tile);
     for(auto &i : NPCs)
@@ -71,16 +70,4 @@ void Map::draw(sf::RenderWindow& window, float move_fraction)
         i.second.draw(window, map_offset, p_per_tile);
 
     mutex.unlock();
-}
-
-unsigned long Map::findclose() const
-{
-    for(auto &i : NPCs)
-    {
-        sf::Vector2i temp = center_pos - i.second.get_position();
-        if(temp.x >= -1 && temp.x <= 1)
-            if(temp.y >= -1 && temp.y <= 1)
-                return i.first;
-    }
-    return ULONG_MAX;
 }

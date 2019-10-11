@@ -39,8 +39,6 @@ public:
 
     void clear();
     void draw(sf::RenderWindow& window, float move_fraction);
-
-    unsigned long findclose() const;
 };
 
 #endif // MAP_HPP_INCLUDED

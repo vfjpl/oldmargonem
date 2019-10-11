@@ -11,7 +11,6 @@ class Network
     Poco::Net::HTTPClientSession session;
     Poco::Net::HTTPRequest request;
     std::queue<std::string> fifo;
-    std::string ml;
 
     std::string pid;
     std::string ev;

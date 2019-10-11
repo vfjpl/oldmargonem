@@ -1,5 +1,4 @@
 #include "hero.hpp"
-#include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
 void Hero::set_screen_size(sf::Vector2u value)

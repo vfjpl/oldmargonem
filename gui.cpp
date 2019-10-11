@@ -31,9 +31,7 @@ void Gui::set_screen_size(sf::Vector2u value)
     usable_screen_size.x = value.x - interface_size.x;
     usable_screen_size.y = value.y;
 
-    sf::Vector2f offset;
-    offset.x = usable_screen_size.x;
-    right_panel_sprite.setPosition(offset);
+    right_panel_sprite.setPosition(sf::Vector2f(usable_screen_size.x, 0));
 
     //540x270 oldmargonem chatbox position
     chatbox->setPosition(sf::Vector2f(value.x-(792-540), 270));
