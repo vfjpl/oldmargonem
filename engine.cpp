@@ -403,6 +403,12 @@ void Engine::process_network()
             resource_manager.load_graphic(parm, Graphic::BATTLEPLACE);
             break;
         }
+        case char2int("log")://FINISHED
+        {
+            std::string parm = line.substr(colon + 1);
+            gui.chatbox->addLine(parm);
+            break;
+        }
         case char2int("chat")://FINISHED
         {
             std::string parm = line.substr(colon + 1);
