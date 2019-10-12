@@ -59,7 +59,7 @@ Engine::Engine()
         gui.editbox->setText(sf::String());
     });
 
-    //temp
+    //TEMPORARILY HERE
     setup_window(true);
     network.login();
     network.queueLoadSequence();
@@ -77,7 +77,7 @@ bool Engine::run_game()
 bool Engine::run_network()
 {
     network.sendRequest();
-    process_network();
+    process_network(network.receiveResponse());
 
     return window.isOpen();
 }
@@ -104,8 +104,8 @@ void Engine::resize_window(sf::Vector2u screen_size)
 {
     gui.set_screen_size(screen_size);
     sf::Vector2u usable_size = gui.usableScreenSize();
-    hero.set_screen_size(usable_size);
     map.set_screen_size(usable_size);
+    hero.set_screen_size(usable_size);
 }
 
 void Engine::process_input()
@@ -137,8 +137,10 @@ void Engine::process_input()
                 keyboard.keys[2] = true;
                 break;
             case sf::Keyboard::E:
+                network.queueEnter();
                 break;
             case sf::Keyboard::F:
+                //fight enemy
                 break;
             case sf::Keyboard::Escape:
                 window.close();
@@ -184,7 +186,7 @@ void Engine::process_input()
 
 void Engine::game_logic()
 {
-    if(keyboard.anyKey() && clock.moveInterrupt())
+    if(keyboard.anyKey() && clock.walkInterrupt())
     {
         network.set_pdir(keyboard.dir);
         hero.set_dir(keyboard.dir);
@@ -199,16 +201,14 @@ void Engine::game_logic()
 
 void Engine::draw_frame()
 {
-    map.draw(window, clock.getMoveTime());
+    map.draw(window, clock.getWalkTime());
     hero.draw(window);
     gui.draw(window);
     window.display();
 }
 
-void Engine::process_network()
+void Engine::process_network(const std::string& body)
 {
-    std::string body = network.receiveResponse();
-
     for(size_t old_pos = 0;;)
     {
         size_t new_pos = body.find("<eol>\n<eol>", old_pos);
@@ -220,7 +220,7 @@ void Engine::process_network()
         {
         case char2int("hero"):
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p = split2(parm, '=', ';');
 
             //p[0-1] is hero pos
@@ -261,7 +261,7 @@ void Engine::process_network()
         }
         case char2int("town")://FINISHED
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p = split(parm, ';');
 
             //p[0-1] is map size
@@ -277,7 +277,7 @@ void Engine::process_network()
         }
         case char2int("move")://FINISHED
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p = split(parm, ',');
 
             //p[0-1] is hero pos
@@ -292,23 +292,25 @@ void Engine::process_network()
         }
         case char2int("element"):
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p = split2(parm, '=', ';');
+            unsigned long id;
 
-            //p[1] is element id
-            unsigned long id = std::stoul(p[1]);
             //p[0] element type
             switch(str2int(p[0]))
             {
             case char2int("item"):
+                //p[1] is item id
                 //p[2] is item name
                 //p[3-4] is item position
                 //p[5] is item graphic
+                id = std::stoul(p[1]);
                 resource_manager.load_graphic(p[5], Graphic::ITEM);
                 map.items[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 map.items[id].set_texture(resource_manager.get_texture(p[5]));
                 break;
             case char2int("npc"):
+                //p[1] is npc id
                 //p[2] is npc nick
                 //p[3-4] is npc position
                 //p[5] is npc graphic
@@ -317,11 +319,13 @@ void Engine::process_network()
                 //p[8] is
                 //p[9] is npc group fight
                 //p[10] is npc questmark
+                id = std::stoul(p[1]);
                 resource_manager.load_graphic(p[5], Graphic::NPC);
                 map.NPCs[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 map.NPCs[id].set_texture(resource_manager.get_texture(p[5]));
                 break;
             case char2int("other"):
+                //p[1] is other id
                 //p[2] is other nick
                 //p[3-4] is other position
                 //p[5] is other profession
@@ -330,6 +334,7 @@ void Engine::process_network()
                 //p[8] is
                 //p[9] is other level
                 //p[10] is other clan tag
+                id = std::stoul(p[1]);
                 resource_manager.load_graphic(p[7], Graphic::HERO);
                 map.players[id].set_position(sf::Vector2i(std::stoi(p[3]), std::stoi(p[4])));
                 map.players[id].set_texture(resource_manager.get_texture(p[7]));
@@ -341,9 +346,9 @@ void Engine::process_network()
             }// end switch
             break;
         }
-        case char2int("othermove")://FINISHED
+        case char2int("othermove"):
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p1 = split(parm, ',');
             std::vector<std::string> p2 = split2(p1[1], '=', ';');
 
@@ -366,7 +371,7 @@ void Engine::process_network()
         }
         case char2int("delete")://FINISHED
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p = split(parm, ',');
 
             //p[0] is id
@@ -391,7 +396,7 @@ void Engine::process_network()
         }
         case char2int("battlemsg"):
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             std::vector<std::string> p = split(parm, ';');
 
             network.set_bseq(p[0]);
@@ -399,50 +404,26 @@ void Engine::process_network()
         }
         case char2int("battleref"):
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             resource_manager.load_graphic(parm, Graphic::BATTLEPLACE);
             break;
         }
-        case char2int("log")://FINISHED
+        case char2int("lastevent")://FINISHED
         {
-            std::string parm = line.substr(colon + 1);
-            gui.chatbox->addLine(parm);
-            break;
-        }
-        case char2int("chat")://FINISHED
-        {
-            std::string parm = line.substr(colon + 1);
-            gui.chatbox->addLine(parm);
-            break;
-        }
-        case char2int("alert")://FINISHED
-        {
-            std::string parm = line.substr(colon +1);
-            gui.chatbox->addLine(parm);
-            break;
-        }
-        case char2int("msg")://FINISHED
-        {
-            std::string parm = line.substr(colon +1);
-            gui.chatbox->addLine(parm);
+            std::string parm = line.substr(colon+1);
+            network.set_ev(parm);
             break;
         }
         case char2int("maxchat")://FINISHED
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             network.set_lastch(parm);
             break;
         }
         case char2int("maxcchat")://FINISHED
         {
-            std::string parm = line.substr(colon + 1);
+            std::string parm = line.substr(colon+1);
             network.set_lastcch(parm);
-            break;
-        }
-        case char2int("lastevent")://FINISHED
-        {
-            std::string parm = line.substr(colon + 1);
-            network.set_ev(parm);
             break;
         }
         case char2int("reload")://FINISHED
@@ -452,14 +433,17 @@ void Engine::process_network()
             network.queueLoadSequence();
             break;
         }
+        case char2int("chat")://FINISHED
+        case char2int("msg")://FINISHED
+        case char2int("alert")://FINISHED
+        case char2int("log")://FINISHED
+        {
+            std::string parm = line.substr(colon+1);
+            gui.chatbox->addLine(parm);
+            break;
+        }
         case char2int("xy")://FINISHED
-        {
-            break;
-        }
         case char2int("sqltime")://FINISHED
-        {
-            break;
-        }
         case char2int("end")://FINISHED
         {
             break;

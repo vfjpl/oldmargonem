@@ -33,7 +33,7 @@ private:
     void game_logic();
     void draw_frame();
 
-    void process_network();
+    void process_network(const std::string& body);
 };
 
 #endif // ENGINE_HPP_INCLUDED

@@ -8,6 +8,7 @@ class NPC
 {
     sf::Sprite npc_sprite;
     sf::Vector2f p_correction;
+
     sf::Vector2i npc_pos;
 
 public:

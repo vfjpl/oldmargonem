@@ -8,6 +8,7 @@ class Item
 {
     sf::Sprite item_sprite;
     sf::Vector2f p_correction;
+
     sf::Vector2i item_pos;
 
 public:

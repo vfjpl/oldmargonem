@@ -7,15 +7,12 @@ class MyClock
 {
     sf::Clock clock;
     sf::Time last_clock;
-    sf::Time move_time;
+    sf::Time walk_time;
 
 public:
-    float getMoveTime() const;
-
-    //updates interrupt times
     void update();
-    //true only when certain amount of time have passed
-    bool moveInterrupt();
+    bool walkInterrupt();
+    float getWalkTime() const;
 };
 
 #endif // MYCLOCK_HPP_INCLUDED

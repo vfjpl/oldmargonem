@@ -38,7 +38,9 @@ public:
     void center(sf::Vector2i value);
 
     void clear();
-    void draw(sf::RenderWindow& window, float move_fraction);
+    void draw(sf::RenderWindow& window, float walk_fraction);
+
+    unsigned long npcCloseTo(sf::Vector2i pos) const;
 };
 
 #endif // MAP_HPP_INCLUDED

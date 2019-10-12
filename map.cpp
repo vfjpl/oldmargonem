@@ -41,13 +41,13 @@ void Map::clear()
     mutex.unlock();
 }
 
-void Map::draw(sf::RenderWindow& window, float move_fraction)
+void Map::draw(sf::RenderWindow& window, float walk_fraction)
 {
     sf::Vector2f map_offset;
-    if(move_fraction < 1/MOVEMENT_SPEED)
+    if(walk_fraction < 1/MOVEMENT_SPEED)
     {
         map_offset = (sf::Vector2f(center_old_pos) * p_per_tile) - screen_center +
-                     (sf::Vector2f(center_pos_diff) * (p_per_tile * move_fraction * MOVEMENT_SPEED));
+                     (sf::Vector2f(center_pos_diff) * (p_per_tile * walk_fraction * MOVEMENT_SPEED));
     }
     else
     {
@@ -70,4 +70,16 @@ void Map::draw(sf::RenderWindow& window, float move_fraction)
         i.second.draw(window, map_offset, p_per_tile);
 
     mutex.unlock();
+}
+
+unsigned long Map::npcCloseTo(sf::Vector2i pos) const
+{
+    for(auto &i : NPCs)
+    {
+        sf::Vector2i temp = i.second.get_position() - pos;
+        if(temp.x >= -1 && temp.x <= 1)
+            if(temp.y >= -1 && temp.y <= 1)
+                return i.first;
+    }
+    return 0;
 }

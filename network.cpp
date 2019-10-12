@@ -25,8 +25,9 @@ std::string getTimeString()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    //9 digits
+    //1s == 1000ms == 1000000us
     unsigned long rev = (tv.tv_sec*10000) + (tv.tv_usec/100);
+    //9 digits == 00000.0000s
     return std::to_string(rev).substr(5);
 }
 std::string toString(std::istream& stream)
@@ -92,7 +93,7 @@ void Network::login(const std::string& login, const std::string& password)
     ev = '0';
     pid = getPidValue(body);
 
-    //Cookies
+    //cookies
     std::vector<Poco::Net::HTTPCookie> cookies_vec;
     Poco::Net::NameValueCollection cookies;
 
@@ -105,7 +106,6 @@ void Network::login(const std::string& login, const std::string& password)
 
 void Network::queueMove(sf::Vector2i value)
 {
-
     fifo.emplace("dir=" + pdir + "&ml=" + std::to_string(value.x) + ',' + std::to_string(value.y) + "&task=go");
 }
 
@@ -116,8 +116,6 @@ void Network::queueEnter()
 
 void Network::queueFight(unsigned long id)
 {
-    if(id == ULONG_MAX)
-        return;
     fifo.emplace("auto=1&attack=" + std::to_string(id)  + "&task=fight");
 }
 
