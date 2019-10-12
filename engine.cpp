@@ -136,9 +136,9 @@ void Engine::process_input()
                 keyboard.dir = '2';
                 keyboard.keys[2] = true;
                 break;
-            case sf::Keyboard::F:
-                break;
             case sf::Keyboard::E:
+                break;
+            case sf::Keyboard::F:
                 break;
             case sf::Keyboard::Escape:
                 window.close();
