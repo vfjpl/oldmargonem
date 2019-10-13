@@ -21,6 +21,16 @@ void Hero::set_texture(const sf::Texture& texture)
     p_correction = p_per_tile/2.f;
 }
 
+void Hero::draw(sf::RenderWindow& window)
+{
+    window.draw(hero_sprite);
+}
+
+sf::Vector2i Hero::getPosition() const
+{
+    return hero_pos;
+}
+
 void Hero::set_dir(char value)
 {
     sprite_rect.top = (value - '0') * p_per_tile.y;
@@ -44,14 +54,4 @@ void Hero::move(char dir)
         --hero_pos.y;
         break;
     }// end switch
-}
-
-sf::Vector2i Hero::getPosition() const
-{
-    return hero_pos;
-}
-
-void Hero::draw(sf::RenderWindow& window)
-{
-    window.draw(hero_sprite);
 }

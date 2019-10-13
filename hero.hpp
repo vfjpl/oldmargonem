@@ -17,12 +17,11 @@ public:
     void set_screen_size(sf::Vector2u value);
     void set_pos(sf::Vector2i value);
     void set_texture(const sf::Texture& texture);
-    void set_dir(char value);
-
-    //move in specified direction
-    void move(char dir);
-    sf::Vector2i getPosition() const;
     void draw(sf::RenderWindow& window);
+
+    sf::Vector2i getPosition() const;
+    void set_dir(char value);
+    void move(char dir);
 };
 
 #endif // HERO_HPP_INCLUDED
