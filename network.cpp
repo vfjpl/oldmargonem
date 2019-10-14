@@ -1,5 +1,4 @@
 #include "network.hpp"
-#include <Poco/URI.h>
 #include <Poco/SHA1Engine.h>
 #include <Poco/Net/HTMLForm.h>
 #include <Poco/Net/NameValueCollection.h>
@@ -10,6 +9,12 @@
 
 namespace
 {
+std::string Query::percentEncode(const char* value)
+{
+    std::string msg;
+    Poco::URI::encode(value, Poco::URI::RESERVED_PATH, msg);
+    return msg;
+}
 std::string sha1(const std::string& password)
 {
     Poco::SHA1Engine sha1engine;
@@ -121,7 +126,7 @@ void Network::queueFight(unsigned long id)
 
 void Network::queueMessage(const char* value)
 {
-    fifo.emplace("tekst=" + Poco::URI(value).toString() + "&task=chat");
+    fifo.emplace("tekst=" + Query::percentEncode(value) + "&task=chat");
 }
 
 void Network::queueLoadSequence()

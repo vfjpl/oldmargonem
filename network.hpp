@@ -1,10 +1,20 @@
 #ifndef NETWORK_HPP_INCLUDED
 #define NETWORK_HPP_INCLUDED
 
+#include <Poco/URI.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <SFML/System/Vector2.hpp>
 #include <queue>
+
+namespace
+{
+class Query: public Poco::URI
+{
+public:
+    static std::string percentEncode(const char* value);
+};
+}
 
 class Network
 {
