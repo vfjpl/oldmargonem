@@ -9,10 +9,10 @@
 
 namespace
 {
-std::string Query::percentEncode(const char* value)
+std::string Query::percentEncode(const std::string& value)
 {
     std::string msg;
-    Poco::URI::encode(value, Poco::URI::RESERVED_PATH, msg);
+    Poco::URI::encode(value, Poco::URI::RESERVED_QUERY_PARAM, msg);
     return msg;
 }
 std::string sha1(const std::string& password)

@@ -12,7 +12,7 @@ namespace
 class Query: public Poco::URI
 {
 public:
-    static std::string percentEncode(const char* value);
+    static std::string percentEncode(const std::string& value);
 };
 }
 
