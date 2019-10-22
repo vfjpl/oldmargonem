@@ -16,7 +16,7 @@ void Resource_Manager::load_graphic(const std::string& name, Graphic type)
     if(storage.count(name))
         return;
 
-    std::string path;
+    const char* path;
     switch(type)
     {
     case GAME:
