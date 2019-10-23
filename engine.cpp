@@ -51,8 +51,8 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 
 Engine::Engine()
 {
-    gui.editbox->connect("Focused", [&] {keyboard.block = true;});
-    gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
+    gui.editbox->connect("Focused", [&]{keyboard.block = true;});
+    gui.editbox->connect("Unfocused", [&]{keyboard.block = false;});
     gui.editbox->connect("ReturnKeyPressed", [&](const sf::String& msg)
     {
         network.queueMessage((char*)msg.toUtf8().data());
