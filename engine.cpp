@@ -15,7 +15,7 @@ int str2int(const std::string& str)
 constexpr int char2int(const char* str)
 {
     int res = 0;
-    for(sf::Uint8 i = 0; i < strlen(str); ++i)
+    for(sf::Uint8 i = 0; str[i] != '\0'; ++i)
         res += str[i];
     return res;
 }
@@ -51,8 +51,8 @@ std::vector<std::string> split2(const std::string& parm, char first, char second
 
 Engine::Engine()
 {
-    gui.editbox->connect("Focused", [&]{keyboard.block = true;});
-    gui.editbox->connect("Unfocused", [&]{keyboard.block = false;});
+    gui.editbox->connect("Focused", [&] {keyboard.block = true;});
+    gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
     gui.editbox->connect("ReturnKeyPressed", [&](const sf::String& msg)
     {
         network.queueMessage((char*)msg.toUtf8().data());
