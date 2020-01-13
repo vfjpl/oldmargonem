@@ -55,7 +55,7 @@ Engine::Engine()
     gui.editbox->connect("Unfocused", [&] {keyboard.block = false;});
     gui.editbox->connect("ReturnKeyPressed", [&](const sf::String& msg)
     {
-        network.queueMessage((char*)msg.toUtf8().data());
+        network.queueMessage((const char*)msg.toUtf8().data());
         gui.editbox->setText(sf::String());
     });
 
@@ -439,7 +439,7 @@ void Engine::process_network(const std::string& body)
         case char2int("log")://FINISHED
         {
             std::string parm = line.substr(colon+1);
-            gui.chatbox->addLine(parm);
+            gui.chatbox->addLine(sf::String::fromUtf8(parm.cbegin(), parm.cend()));
             break;
         }
         case char2int("xy")://FINISHED
